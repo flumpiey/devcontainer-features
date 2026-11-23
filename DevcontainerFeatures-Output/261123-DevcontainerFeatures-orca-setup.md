@@ -9,7 +9,7 @@ Assumptions: runtime WSL, solo repo, Claude Code only, orca.yaml committed, GitH
 
 ## 2. Hosts and runtime
 - Available Hosts: Local Windows ready
-- Project runtime: WSL (Features are bash scripts and need Docker; lefthook needs sh)
+- Project runtime: Windows (decided 2026-11-23; hooks run through Git Bash sh)
 - Agents: Claude Code (permission preset Auto)
 - Existing terminals keep their runtime; restart them after changing.
 
@@ -75,11 +75,11 @@ scripts:
 - Write none of these until you say go.
 
 ## 11. Commit guard (commitlint + attribution)
-- Claude settings: missing. Merge into `%USERPROFILE%\.claude\settings.json` and `~/.claude/settings.json` inside WSL.
+- Claude settings: missing. Merge into `%USERPROFILE%\.claude\settings.json`.
 - commitlint: missing. See Bootstrap prompt.
 - commit-msg hook: missing. See Bootstrap prompt (no hook manager, so lefthook).
 - CI: missing. GitHub pr-hygiene is inside the Bootstrap prompt.
-- Bootstrap prompt: below. Run it in WSL after the first commit exists.
+- Bootstrap prompt: below. Run it in PowerShell on Windows. Add `.gitattributes` with `*.sh text eol=lf` in the same commit.
 
 Claude settings block (remove `includeCoAuthoredBy` if present):
 ```json
@@ -242,7 +242,7 @@ Not ready. Next: run orca-unattended-speckit, after the first commit, the Bootst
 1. Run `orca status --json` and `orca repo list --json`. Confirm the repo is listed with base ref `origin/main`.
 2. Create a throwaway worktree `orca-setup-test` from `main`. Confirm setup ends clean.
 3. In its terminal run `ls node_modules/.bin | head`. Confirm `commitlint` and `lefthook` exist.
-4. Skip (WSL runtime).
+4. Windows runtime: add `echo "shell=$0 ps=$PSVersionTable"` as the first line of the setup script. Read the output. Remove the line.
 5. Run `git commit --allow-empty -m "Added stuff"`. Confirm commitlint rejects it. Run `git commit --allow-empty -m "chore: test hook" -m "Co-Authored-By: Claude <noreply@anthropic.com>"`. Confirm `git log -1 --format=%B` shows no trailer. Run `git reset --hard HEAD~1` in the throwaway worktree only.
 6. Stage a trivial change. Run Generate commit message. Confirm it passes commitlint.
 7. Open a draft PR titled "Added stuff" from a test branch. Confirm pr-hygiene fails. Close the PR and delete the branch.
