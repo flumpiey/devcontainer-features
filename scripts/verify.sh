@@ -44,6 +44,17 @@ fast() {
     jq empty "$f" || problem "invalid JSON: $f"
   done < <(find . \( -name node_modules -o -name .git -o -name DevcontainerFeatures-Output \) -prune -o -type f -name '*.json' -print0)
 
+  # FR-024: the install.sh constants equal the JSON defaults.
+  local install=src/orca-server/install.sh json=src/orca-server/devcontainer-feature.json
+  if [ -f "$install" ] && [ -f "$json" ]; then
+    local opt const
+    for opt in version:DEFAULT_VERSION debSha256:DEFAULT_DEB_SHA256; do
+      const="$(sed -n "s/^${opt#*:}=//p" "$install")"
+      [ "$const" = "$(jq -r ".options.${opt%%:*}.default" "$json")" ] ||
+        problem "${opt#*:} in $install differs from the ${opt%%:*} default in $json"
+    done
+  fi
+
   # Style scan. The word list lives here, and this file is not scanned.
   local targets=()
   for d in docs specs README.md; do
