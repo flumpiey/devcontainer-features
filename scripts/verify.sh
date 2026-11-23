@@ -28,7 +28,8 @@ fast() {
   local sh_files=()
   if [ "${#dirs[@]}" -gt 0 ]; then
     mapfile -t sh_files < <(
-      find "${dirs[@]}" -type f \( -name '*.sh' -o -path src/orca-server/orca-server \) | sort
+      # Bash scripts without a .sh suffix are listed by path.
+      find "${dirs[@]}" -type f \( -name '*.sh' -o -path src/orca-server/orca-server -o -path test/_global/tailscale_stub/tailscale \) | sort
     )
   fi
   if [ "${#sh_files[@]}" -gt 0 ]; then

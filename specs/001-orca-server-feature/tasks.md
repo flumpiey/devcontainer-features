@@ -174,8 +174,8 @@
 
 ## Phase 10: Convergence
 
-- [ ] T059 CRITICAL: Make `test/_global/tailscale_stub/tailscale` a Bash script that starts with `set -euo pipefail`, and make `scripts/verify.sh fast` run shellcheck, shfmt and the header check on it. It is `#!/bin/sh`, has no `set -euo pipefail`, and `fast` skips it because it has no `.sh` suffix. per Constitution II (contradicts)
-- [ ] T060 Pin the devcontainer CLI used inside `devcontainers/action`: add `devcontainer-cli-version: "0.88.0"` to the `validate-only` step in `.github/workflows/test.yaml` and to the publish step in `.github/workflows/release.yaml`. The action defaults to the latest CLI. per FR-029 (partial)
+- [X] T059 CRITICAL: Make `test/_global/tailscale_stub/tailscale` a Bash script that starts with `set -euo pipefail`, and make `scripts/verify.sh fast` run shellcheck, shfmt and the header check on it. It is `#!/bin/sh`, has no `set -euo pipefail`, and `fast` skips it because it has no `.sh` suffix. per Constitution II (contradicts)
+- [X] T060 Pin the devcontainer CLI used inside `devcontainers/action`: add `devcontainer-cli-version: "0.88.0"` to the `validate-only` step in `.github/workflows/test.yaml` and to the publish step in `.github/workflows/release.yaml`. The action defaults to the latest CLI. per FR-029 (partial)
 - [ ] T061 Add three cases to `test/orca-server/build-fails.sh`: `{"port": "99999"}`, `{"tailscaleWaitSeconds": "-1"}` and `{"version": "1.4"}`. Each must fail with its one-line message. Add a fourth case, `{"pairingAddress": "a;b"}`, for the character filter that protects `options.env`. per FR-028 (partial)
 - [ ] T062 Add a scenario `no_autostart` (`autoStart` false, `pairingAddress` `127.0.0.1`) with `no_autostart.sh`: after 15 seconds no Orca process runs and `orca-server status` prints `stopped`. Then `orca-server start` makes it `running`. per US4/AC3 (missing)
 - [ ] T063 Add a check to `test/orca-server/local_address.sh` that the `orca-ide serve` command line contains `--mobile-pairing` at default options. Add a check in `no_autostart.sh` or a new scenario with `mobilePairing` false that the flag is absent. per FR-017 and US3/AC3 (partial)
