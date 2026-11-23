@@ -35,8 +35,8 @@
 
 **Purpose**: the Feature metadata every story depends on.
 
-- [ ] T006 Create `src/orca-server/devcontainer-feature.json` per `contracts/feature-options.md` (FR-001, FR-007, FR-008): `id` `orca-server`, `version` `1.0.0`, `name`, `description`, the seven options with the listed defaults, `installsAfter` (FR-019), `entrypoint` `/usr/local/share/orca-server/entrypoint.sh`, `mounts` volume `orca-server-data-${devcontainerId}` at `/var/lib/orca-server`. Option defaults follow `data-model.md options.env keys.VERSION`, `.PORT`, `.TAILSCALE_WAIT_SECONDS` and `.DEB_SHA256`.
-- [ ] T007 Run `bash scripts/verify.sh fast`.
+- [X] T006 Create `src/orca-server/devcontainer-feature.json` per `contracts/feature-options.md` (FR-001, FR-007, FR-008): `id` `orca-server`, `version` `1.0.0`, `name`, `description`, the seven options with the listed defaults, `installsAfter` (FR-019), `entrypoint` `/usr/local/share/orca-server/entrypoint.sh`, `mounts` volume `orca-server-data-${devcontainerId}` at `/var/lib/orca-server`. Option defaults follow `data-model.md options.env keys.VERSION`, `.PORT`, `.TAILSCALE_WAIT_SECONDS` and `.DEB_SHA256`.
+- [X] T007 Run `bash scripts/verify.sh fast`.
 
 ---
 

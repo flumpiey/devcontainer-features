@@ -1,0 +1,55 @@
+{
+  "id": "orca-server",
+  "version": "1.0.0",
+  "name": "Orca server",
+  "description": "Installs Orca (orca-ide) and serves it on your tailnet at container start.",
+  "options": {
+    "version": {
+      "type": "string",
+      "default": "1.4.271",
+      "description": "Orca release to install, for example 1.4.271, or latest."
+    },
+    "pairingAddress": {
+      "type": "string",
+      "default": "",
+      "description": "Address in the pairing link. Empty means the Tailscale DNS name. When set, the entrypoint does not wait for or call Tailscale."
+    },
+    "port": {
+      "type": "string",
+      "default": "6768",
+      "description": "TCP port Orca listens on, 1 to 65535."
+    },
+    "mobilePairing": {
+      "type": "boolean",
+      "default": true,
+      "description": "Serve Orca with mobile pairing enabled."
+    },
+    "autoStart": {
+      "type": "boolean",
+      "default": true,
+      "description": "Start Orca in the background at container start."
+    },
+    "tailscaleWaitSeconds": {
+      "type": "string",
+      "default": "120",
+      "description": "Seconds to wait for Tailscale to report Running before the start fails. 0 means one check."
+    },
+    "debSha256": {
+      "type": "string",
+      "default": "7fad3d721dc0b0920f248353f5391fe0138331791acb64c9677c7a91bf41e755",
+      "description": "Expected SHA-256 of the .deb. Keep the default for the default version. For another version, leave it as is to use the release digest."
+    }
+  },
+  "installsAfter": [
+    "ghcr.io/tailscale/codespace/tailscale",
+    "ghcr.io/devcontainers-extra/features/tailscale"
+  ],
+  "entrypoint": "/usr/local/share/orca-server/entrypoint.sh",
+  "mounts": [
+    {
+      "source": "orca-server-data-${devcontainerId}",
+      "target": "/var/lib/orca-server",
+      "type": "volume"
+    }
+  ]
+}
