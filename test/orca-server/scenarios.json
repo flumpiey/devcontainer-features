@@ -44,6 +44,7 @@
   "non_root": {
     "image": "__BASE__",
     "containerUser": "vscode",
+    "updateRemoteUserUID": false,
     "features": {
       "orca-server": {
         "pairingAddress": "127.0.0.1"
