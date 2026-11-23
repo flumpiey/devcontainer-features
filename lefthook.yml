@@ -7,7 +7,7 @@ commit-msg:
   commands:
     strip-ai-attribution:
       priority: 1
-      run: sh scripts/commit-msg.sh
+      run: bash scripts/commit-msg.sh
     commitlint:
       priority: 2
       run: npx --no -- commitlint --edit
