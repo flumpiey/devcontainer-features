@@ -42,5 +42,10 @@ expect_fail bad_hash "$IMAGE" "" '{"debSha256": "0000000000000000000000000000000
 expect_fail old_base debian:11 "" '{}' 'unsupported base debian 11'
 # FR-014: a root remote user is refused.
 expect_fail root_user "$IMAGE" root '{}' 'remoteUser must be a non-root user'
+# FR-028: bad option values fail with one line. The address filter also guards options.env, which is sourced.
+expect_fail bad_port "$IMAGE" "" '{"port": "99999"}' 'port must be an integer from 1 to 65535'
+expect_fail bad_wait "$IMAGE" "" '{"tailscaleWaitSeconds": "-1"}' 'tailscaleWaitSeconds must be a non-negative integer'
+expect_fail bad_version "$IMAGE" "" '{"version": "1.4"}' "version must be 'latest' or look like"
+expect_fail bad_address "$IMAGE" "" '{"pairingAddress": "a;b"}' 'pairingAddress may hold only'
 
 exit "$status"

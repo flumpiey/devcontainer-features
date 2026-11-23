@@ -49,5 +49,15 @@
         "pairingAddress": "127.0.0.1"
       }
     }
+  },
+  "no_autostart": {
+    "image": "__BASE__",
+    "features": {
+      "orca-server": {
+        "pairingAddress": "127.0.0.1",
+        "autoStart": false,
+        "mobilePairing": false
+      }
+    }
   }
 }

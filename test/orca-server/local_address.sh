@@ -33,6 +33,9 @@ entrypoint_within_2s() {
 # AC16: Orca refuses public peers.
 refuses_public() { tr '\0' ' ' <"/proc/$(<"$DATA/orca-server.pid")/cmdline" | grep -q -- '--refuse-public'; }
 
+# FR-017: mobilePairing is true by default.
+mobile_pairing_on() { tr '\0' ' ' <"/proc/$(<"$DATA/orca-server.pid")/cmdline" | grep -q -- '--mobile-pairing'; }
+
 # AC8, T043: the process runs as the remote user, not root, and no DISPLAY is set (research D5).
 runs_as_remote_user() {
   local want
@@ -52,6 +55,7 @@ second_start_adds_nothing() {
 check "Orca answers HTTP within 90 s" serves_http
 check "entrypoint exec within 2 s" entrypoint_within_2s
 check "Orca refuses public peers" refuses_public
+check "Orca starts with --mobile-pairing by default" mobile_pairing_on
 check "Orca runs as the remote user with no DISPLAY" runs_as_remote_user
 check "second start adds no process" second_start_adds_nothing
 

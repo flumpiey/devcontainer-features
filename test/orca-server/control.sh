@@ -32,6 +32,22 @@ status_and_stop() {
   is_stopped
 }
 
+# FR-023: with Orca stopped, each form prints nothing on stdout, one error line on stderr, and exits 1.
+url_fails_cleanly() {
+  local form out rc errf
+  errf="$(mktemp)"
+  for form in "" "--mobile"; do
+    rc=0
+    out="$(orca-server url $form 2>"$errf")" || rc=$?
+    if [ "$rc" != 1 ] || [ -n "$out" ] || [ "$(wc -l <"$errf")" != 1 ] || ! grep -q '^orca-server: error:' "$errf"; then
+      cat "$errf" >&2
+      rm -f "$errf"
+      return 1
+    fi
+  done
+  rm -f "$errf"
+}
+
 # Port in use: Orca exits, the script logs it, status says stopped, nothing restarts it.
 port_conflict() {
   sudo -n apt-get update -qq >/dev/null
@@ -72,6 +88,7 @@ restart_replaces_link() {
 }
 
 check "status and stop report running then stopped" status_and_stop
+check "url prints one error and exits 1 when Orca is stopped" url_fails_cleanly
 check "a taken port is logged and leaves status stopped" port_conflict
 check "an Orca crash is logged" crash_is_logged
 check "a restart replaces the pairing link" restart_replaces_link
