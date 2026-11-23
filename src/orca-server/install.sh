@@ -136,6 +136,10 @@ EOF
 printf '%s\n' "$REMOTE_USER" >"$SHARE_DIR/remote-user"
 chmod 0644 "$SHARE_DIR/options.env" "$SHARE_DIR/remote-user"
 
+SRC_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+install -m 0755 "$SRC_DIR/entrypoint.sh" "$SHARE_DIR/entrypoint.sh"
+install -m 0755 "$SRC_DIR/orca-server" /usr/local/bin/orca-server
+
 # FR-015, Decision 18: a new named volume inherits this owner and mode.
 install -d -o "$REMOTE_USER" -g "$(id -gn "$REMOTE_USER")" -m 0700 "$DATA_DIR"
 
