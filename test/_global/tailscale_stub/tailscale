@@ -1,0 +1,9 @@
+#!/bin/sh
+# Stub: reports NoState for the first 15 seconds after the first call, then Running.
+marker=/var/tmp/tailscale-stub-first-call
+[ -e "$marker" ] || date +%s >"$marker"
+if [ $(($(date +%s) - $(cat "$marker"))) -lt 15 ]; then
+  echo '{"BackendState":"NoState"}'
+else
+  echo '{"BackendState":"Running","Self":{"DNSName":"host.tail1234.ts.net.","TailscaleIPs":["100.64.0.5"]}}'
+fi

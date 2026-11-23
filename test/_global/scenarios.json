@@ -1,0 +1,9 @@
+{
+  "tailscale_stub": {
+    "build": { "dockerfile": "Dockerfile" },
+    "features": {
+      "orca-server": { "tailscaleWaitSeconds": "90" },
+      "ghcr.io/devcontainers/features/sshd:1": {}
+    }
+  }
+}
