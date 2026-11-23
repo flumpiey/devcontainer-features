@@ -7,7 +7,7 @@
     "version": {
       "type": "string",
       "default": "1.4.271",
-      "description": "Orca release to install, for example 1.4.271, or latest."
+      "description": "Orca release to install. The default, 1.4.271, is the tested version. The value latest is not tested."
     },
     "pairingAddress": {
       "type": "string",

@@ -70,6 +70,8 @@ The release workflow needs the repository setting "Allow GitHub Actions to creat
 
 Publish a fixed patch version. Change `version` in `devcontainer-feature.json`. When you change the Orca default, also change `DEFAULT_VERSION` and `DEFAULT_DEB_SHA256` in `install.sh` in the same commit. Take the digest from `gh api repos/stablyai/orca/releases/tags/v<version>`.
 
+Users can pin an exact Feature version, for example `ghcr.io/flumpiey/devcontainer-features/orca-server:1.0.0`, so a later bad patch does not reach them.
+
 To delete one published version, use the GitHub package page, or the API:
 
 ```bash
