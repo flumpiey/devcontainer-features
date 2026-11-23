@@ -17,7 +17,8 @@ jq -n '{image: "mcr.microsoft.com/devcontainers/base:bookworm", features: {"./or
 npx --yes "@devcontainers/cli@$DEVCONTAINER_CLI_VERSION" build --workspace-folder "$(native "$work")" --image-name "$IMAGE_NAME"
 
 {
-  docker run --rm --entrypoint cat "$IMAGE_NAME" /usr/local/share/orca-server/options.env /usr/local/share/orca-server/remote-user
+  # MSYS_NO_PATHCONV stops Git Bash on Windows from rewriting the container paths.
+  MSYS_NO_PATHCONV=1 docker run --rm --entrypoint cat "$IMAGE_NAME" /usr/local/share/orca-server/options.env /usr/local/share/orca-server/remote-user
   docker history --no-trunc "$IMAGE_NAME"
 } >"$work/scan.txt"
 
