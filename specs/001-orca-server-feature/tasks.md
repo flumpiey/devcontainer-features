@@ -171,3 +171,16 @@
 - MVP: Phases 1 to 3 give a Feature that installs and verifies Orca on three bases. Phases 4 and 5 then deliver the working server and pairing. Stop and test after each STOP.
 - Incremental: US1, then US2 and US3 (both P1), then US4, then tests, then publish.
 - Tests come after code here because plan.md fixes the order. Each phase still ends with `bash scripts/verify.sh fast`.
+
+## Phase 10: Convergence
+
+- [ ] T059 CRITICAL: Make `test/_global/tailscale_stub/tailscale` a Bash script that starts with `set -euo pipefail`, and make `scripts/verify.sh fast` run shellcheck, shfmt and the header check on it. It is `#!/bin/sh`, has no `set -euo pipefail`, and `fast` skips it because it has no `.sh` suffix. per Constitution II (contradicts)
+- [ ] T060 Pin the devcontainer CLI used inside `devcontainers/action`: add `devcontainer-cli-version: "0.88.0"` to the `validate-only` step in `.github/workflows/test.yaml` and to the publish step in `.github/workflows/release.yaml`. The action defaults to the latest CLI. per FR-029 (partial)
+- [ ] T061 Add three cases to `test/orca-server/build-fails.sh`: `{"port": "99999"}`, `{"tailscaleWaitSeconds": "-1"}` and `{"version": "1.4"}`. Each must fail with its one-line message. Add a fourth case, `{"pairingAddress": "a;b"}`, for the character filter that protects `options.env`. per FR-028 (partial)
+- [ ] T062 Add a scenario `no_autostart` (`autoStart` false, `pairingAddress` `127.0.0.1`) with `no_autostart.sh`: after 15 seconds no Orca process runs and `orca-server status` prints `stopped`. Then `orca-server start` makes it `running`. per US4/AC3 (missing)
+- [ ] T063 Add a check to `test/orca-server/local_address.sh` that the `orca-ide serve` command line contains `--mobile-pairing` at default options. Add a check in `no_autostart.sh` or a new scenario with `mobilePairing` false that the flag is absent. per FR-017 and US3/AC3 (partial)
+- [ ] T064 Add a check to `test/orca-server/control.sh`: with Orca stopped, `orca-server url` and `orca-server url --mobile` each print one line starting with `orca-server: error:` on stderr, nothing on stdout, and exit 1. per FR-023 (partial)
+- [ ] T065 Extend `test/orca-server/install_twice.sh`: run `install.sh` a third time with `VERSION=latest`. Expect exit 0, one installed `orca-ide`, and the installed version equal to the release API `tag_name` without the `v`. This covers the digest path of Decision 20 and an in-place version change. per FR-024 and FR-006 (partial)
+- [ ] T066 Add one line to the "Withdraw a bad version" section of `src/orca-server/NOTES.md`: users can pin an exact version such as `:1.0.0` to avoid a withdrawn patch. per FR-031 (partial)
+- [ ] T067 Change the `version` option description in `src/orca-server/devcontainer-feature.json` to name `1.4.271` as the default and the tested version, and keep `debSha256` in step. per Constitution, Technical Constraints (partial)
+- [ ] T068 Review the checks in `install.sh` that FR-028 does not list (`mobilePairing` and `autoStart` must be `true` or `false`, `pairingAddress` character set, `debSha256` is 64 hex digits). Keep them, because `options.env` is sourced as shell, and add a line to `plan.md` Decisions recorded, or remove them. per FR-028 (unrequested)
