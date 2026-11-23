@@ -31,7 +31,7 @@ Usage:
 }
 ```
 
-Install-time exit codes: 0 success; 1 unsupported base or architecture, or option out of range; 2 no .deb asset for the tag; 3 SHA-256 mismatch.
+Install-time exit codes: 0 success; 1 unsupported base or architecture, option out of range, or `_REMOTE_USER` empty or `root`; 2 no .deb asset for the tag, or the release lookup for `latest` failed; 3 SHA-256 mismatch, or the release API gave no usable digest.
 
 Install-time checks:
 

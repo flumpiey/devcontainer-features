@@ -47,7 +47,7 @@ Full sourced findings: [docs/analysis/261123-orca-server-feature.md](../../docs/
 
 ## D8. Release workflow
 
-- Decision: `devcontainers/action@v1` with `publish-features`, `base-path-to-features: ./src`, `generate-docs`, and the three permissions.
+- Decision: `devcontainers/action@v1.4.4` (pinned to a full version, FR-029; v1.4.4 is the newest release on 2026-11-23) with `publish-features`, `base-path-to-features: ./src`, `generate-docs`, and the three permissions.
 - Rationale: documented in the action README. Docs arrive as a pull request. The repo setting "Allow GitHub Actions to create and approve pull requests" must be on.
 
 ## D10. `--refuse-public` and the Tailscale range

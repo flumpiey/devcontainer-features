@@ -12,7 +12,7 @@
 
 - Dru runs one devcontainer per project (Nx monorepos, pnpm) on dru-main-pc under Docker Desktop on WSL2. Each container joins the tailnet boga-amberjack.ts.net through the Feature `ghcr.io/tailscale/codespace/tailscale`, with Tailscale SSH, `tag:devcontainer`, and hostname `<HOSTNAME_PREFIX>-<folder>-dev`.
 - Orca headless mode is `orca-ide serve --port <port> --pairing-address <address>`. It prints a pairing URL that the client pastes into Settings, Remote Orca Servers, Add Server. `--mobile-pairing` enables phone pairing. Orca starts Xvfb on display :99 when no display exists.
-- The Linux .deb installs to `/opt/Orca` and provides the `orca-ide` command. It does not declare libasound2 as a dependency.
+- The Linux .deb installs to `/opt/Orca` and provides the `orca-ide` command. It declares `libasound2t64 | libasound2`, `xvfb`, `libgbm1` and `libnss3` as dependencies, so `apt-get install` resolves them (research.md, analysis R5).
 - Orca has no environment variable or flag for a fixed pairing credential. Each paired client gets a revocable grant that stays valid until revoked.
 
 ## Decisions (fixed, do not re-ask in clarify)
@@ -36,7 +36,7 @@
 17. (Decided 2026-11-23) The log is `/var/lib/orca-server/orca-server.log`, mode 0600, owned by the remote user. The entrypoint and `orca-server start` truncate it at the start of each Orca start. It holds the pairing link, so it MUST NOT be world readable and MUST NOT sit in `/tmp`.
 18. (Decided 2026-11-23) `/var/lib/orca-server` is mode 0700 and `pairing-url.txt` is mode 0600, both owned by the remote user. The entrypoint enforces owner and mode at each start, so an existing volume with other values is corrected.
 19. (Decided 2026-11-23) The GHCR package `ghcr.io/flumpiey/devcontainer-features/orca-server` MUST be public. A new package is private by default. `NOTES.md` states the one-time step to set the visibility to public after the first publish.
-20. (Decided 2026-11-23) Option `debSha256`, string, default `7fad3d721dc0b0920f248353f5391fe0138331791acb64c9677c7a91bf41e755` (the `v1.4.271` digest). A value other than the default is always the expected hash. If `version` is not the default and `debSha256` still equals the default, `install.sh` takes the expected hash from the release API. If the API is unreachable or gives no digest, `install.sh` exits 3 with one error line. `install.sh` holds the default version and default hash as constants, and `verify.sh fast` checks that they equal the JSON defaults. When `version` is `latest`, `install.sh` compares the resolved version with the default version. If they are equal, the default hash applies. Otherwise the API digest applies.
+20. (Decided 2026-11-23) Option `debSha256`, string, default `7fad3d721dc0b0920f248353f5391fe0138331791acb64c9677c7a91bf41e755` (the `v1.4.271` digest). A value other than the default is always the expected hash. If the resolved `version` is not the default and `debSha256` still equals the default, the expected hash comes from the release API. When `version` is `latest`, the resolved version is compared with the default version first. `install.sh` holds the default version and default hash as constants. The full rules, exit codes and message are in FR-024.
 
 ## User Scenarios & Testing *(mandatory)*
 

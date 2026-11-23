@@ -38,7 +38,7 @@ Publish one devcontainer Feature, `orca-server`, to `ghcr.io/flumpiey/devcontain
 |---|-----------|---------------|--------|
 | I | Spec-compliant Features | Layout `src/orca-server/{devcontainer-feature.json,install.sh}`, `test/orca-server/{test.sh,scenarios.json}` | Pass |
 | II | Bash only | All scripts Bash with `set -euo pipefail`; `verify.sh fast` runs shellcheck and `shfmt -d -i 2` | Pass |
-| III | Idempotent installs | Install step skips when `orca-ide --version` already matches; test runs `install.sh` twice | Pass |
+| III | Idempotent installs | Install step skips when `dpkg-query` shows the resolved `orca-ide` version already installed; test runs `install.sh` twice | Pass |
 | IV | Pinned versions | `version` option defaults to `1.4.271`; `latest` is explicit only | Pass: option `debSha256` pins the default version (Decision 20, research.md D2) |
 | V | No secrets in images | Pairing URL, log and grants are written at run time into the volume only (directory 0700, files 0600); `options.env` holds no secret | Pass |
 | VI | Entrypoints never block | Orca starts in the background; Tailscale wait runs inside that background job; entrypoint ends with `exec "$@"`; every step before it is guarded with `|| log`, and an `ERR` trap runs `exec "$@"`, so no failure skips `exec` (spec FR-009) | Pass |
@@ -79,7 +79,9 @@ src/orca-server/
 test/orca-server/
 ├── test.sh
 ├── scenarios.json
-└── <scenario>.sh          # one per scenario
+├── <scenario>.sh          # one per scenario
+├── build-fails.sh         # expected build failures, runs `devcontainer build` itself
+└── secrets_scan.sh        # builds the default image with `devcontainer build`, then scans it
 test/_global/              # only for the Tailscale ordering and entrypoint chaining scenario
 scripts/verify.sh          # modes: fast, push, ci
 .github/workflows/test.yaml
@@ -156,7 +158,7 @@ Each slice ends with `bash scripts/verify.sh fast` and a hard stop.
   | FR-022 no secret in image layers | `secrets_scan.sh` |
   | FR-024 constants equal JSON defaults | `verify.sh fast` |
 
-- **Slice 5. Release.** `.github/workflows/release.yaml` with `devcontainers/action@v1`, the three permissions, `generate-docs`. `NOTES.md` covers pair once, manual re-pair fallback, example `devcontainer.json` with the Tailscale Feature, the one-time step to set the package visibility to public after the first publish, and how to withdraw a bad version. Then run `quickstart.md` and tick `tasks.md`.
+- **Slice 5. Release.** `.github/workflows/release.yaml` with `devcontainers/action@v1.4.4` (pinned, FR-029), the three permissions, `generate-docs`. `NOTES.md` covers pair once, manual re-pair fallback, example `devcontainer.json` with the Tailscale Feature, the one-time step to set the package visibility to public after the first publish, and how to withdraw a bad version. Then run `quickstart.md` and tick `tasks.md`.
 
 ## Complexity Tracking
 
