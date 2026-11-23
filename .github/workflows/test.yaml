@@ -28,5 +28,6 @@ jobs:
         if: github.event_name == 'pull_request'
         uses: devcontainers/action@1082abd5d2bf3a11abccba70eef98df068277772 # v1.4.4
         with:
+          devcontainer-cli-version: "0.88.0"
           validate-only: "true"
           base-path-to-features: ./src
