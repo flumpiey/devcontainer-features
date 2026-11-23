@@ -69,7 +69,7 @@ Not verified: how several Feature entrypoints chain. The spec text found gives o
 - `attribution` in settings.json replaces the deprecated `includeCoAuthoredBy`. It customises commit and PR bylines. Source: https://github.com/anthropics/claude-code/blob/main/CHANGELOG.md
 - `"attribution": false` hides all attribution, but older CLI versions skip a settings file that holds it. Keep the object form in shared files. Same source.
 - `attribution.sessionUrl` omits the claude.ai session link. Same source.
-- Not verified: the exact keys of the object form for an empty commit and PR byline. The plan uses `{"attribution": {"commit": "", "pr": ""}}` and requires a check against the installed CLI before Slice 1 ends.
+- Verified 2026-11-23 against Claude Code 2.1.330 and https://code.claude.com/docs/en/settings-reference.md: the object keys are `commit` (string), `pr` (string) and `sessionUrl` (boolean, default `true`). An empty string hides that byline. `.claude/settings.json` sets `commit` and `pr` to `""` and `sessionUrl` to `false`.
 
 ## Plan changes
 

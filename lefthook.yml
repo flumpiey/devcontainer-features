@@ -1,3 +1,7 @@
+pre-commit:
+  commands:
+    verify-fast:
+      run: bash scripts/verify.sh fast
 commit-msg:
   piped: true
   commands:

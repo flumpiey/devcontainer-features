@@ -6,7 +6,7 @@
 
 **Tests**: Required. The spec has 17 acceptance criteria and constitution principle VIII says a change is done only when `bash scripts/verify.sh ci` passes. Test tasks are in Phase 7, because plan.md fixes "Hard stop: before any test file" at the end of the entrypoint slice.
 
-**Organization**: Phases follow plan.md slices and their hard stops. Tasks carry the user story label from spec.md where one applies. Every `STOP` line is a plan hard stop: do not start the next phase until Dru confirms.
+**Organisation**: Phases follow plan.md slices and their hard stops. Tasks carry the user story label from spec.md where one applies. Every `STOP` line is a plan hard stop: do not start the next phase until Dru confirms.
 
 ## Format: `[ID] [P?] [Story] Description`
 
@@ -21,11 +21,11 @@
 
 **Purpose**: verification and commit tooling. No file under `src/`.
 
-- [ ] T001 Create `scripts/verify.sh` with modes `fast`, `push`, `ci`. `fast` checks only paths that exist, so it passes before `src/` exists, and it fails loud when a tool is missing: shellcheck on every `*.sh` under `src/`, `test/`, `scripts/` plus `src/orca-server/orca-server`; `shfmt -d -i 2` on the same files; each of those files has `set -euo pipefail` within its first 5 lines; `jq empty` on every `*.json`; a grep of `docs/`, `specs/`, `README.md` and `src/**/NOTES.md` for en dashes, em dashes, emojis and ten common US spellings. Keep the word list inside `scripts/verify.sh`, which the grep does not scan, so no spec file has to contain the words. `push` and `ci` call `fast` and print `not wired yet` until T045. Start with `set -euo pipefail`.
-- [ ] T002 [P] Add a `pre-commit` entry to `lefthook.yml` that runs `bash scripts/verify.sh fast`. Keep the existing `commit-msg` hook unchanged.
-- [ ] T003 [P] Create `.claude/settings.json` with `{"attribution": {"commit": "", "pr": ""}}`. First confirm the keys against the installed Claude Code CLI (research item R7 is unverified). If the keys differ, fix the file and update `docs/analysis/261123-orca-server-feature.md` R7.
-- [ ] T004 [P] Create `README.md` with the usage snippet from `contracts/feature-options.md` and a link to `src/orca-server/NOTES.md`.
-- [ ] T005 Run `bash scripts/verify.sh fast` and fix failures.
+- [X] T001 Create `scripts/verify.sh` with modes `fast`, `push`, `ci`. `fast` checks only paths that exist, so it passes before `src/` exists, and it fails loud when a tool is missing: shellcheck on every `*.sh` under `src/`, `test/`, `scripts/` plus `src/orca-server/orca-server`; `shfmt -d -i 2` on the same files; each of those files has `set -euo pipefail` within its first 5 lines; `jq empty` on every `*.json`; a grep of `docs/`, `specs/`, `README.md` and `src/**/NOTES.md` for en dashes, em dashes, emojis and ten common US spellings. Keep the word list inside `scripts/verify.sh`, which the grep does not scan, so no spec file has to contain the words. `push` and `ci` call `fast` and print `not wired yet` until T045. Start with `set -euo pipefail`.
+- [X] T002 [P] Add a `pre-commit` entry to `lefthook.yml` that runs `bash scripts/verify.sh fast`. Keep the existing `commit-msg` hook unchanged.
+- [X] T003 [P] Create `.claude/settings.json` with `{"attribution": {"commit": "", "pr": ""}}`. First confirm the keys against the installed Claude Code CLI (research item R7 is unverified). If the keys differ, fix the file and update `docs/analysis/261123-orca-server-feature.md` R7.
+- [X] T004 [P] Create `README.md` with the usage snippet from `contracts/feature-options.md` and a link to `src/orca-server/NOTES.md`.
+- [X] T005 Run `bash scripts/verify.sh fast` and fix failures.
 
 **STOP**: plan hard stop before any file under `src/`.
 
