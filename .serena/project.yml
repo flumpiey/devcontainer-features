@@ -42,8 +42,6 @@ project_name: "devcontainer-features"
 language_servers:
 - bash
 - json
-- yaml
-- markdown
 - powershell
 
 # the encoding used by text files in the project

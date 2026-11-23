@@ -5,4 +5,4 @@
 - Dev dependencies: `@commitlint/cli` and `@commitlint/config-conventional` ^21.2.4, `lefthook` ^2.2.2.
 - Feature scripts are bash. Spec Kit scripts are PowerShell.
 - Forge and CI: GitHub, GitHub Actions (`pr-hygiene.yml`).
-- Serena language servers: bash, json, yaml, markdown, powershell.
+- Serena language servers: bash, json, powershell. Add yaml or markdown only if the repo needs symbol lookup in them.
