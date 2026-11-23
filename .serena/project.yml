@@ -40,6 +40,10 @@ project_name: "devcontainer-features"
 # The first language server is the default language and the respective language server will be used as a fallback.
 # Note that when using the JetBrains backend, language servers are not used and this list is correspondingly ignored.
 language_servers:
+- bash
+- json
+- yaml
+- markdown
 - powershell
 
 # the encoding used by text files in the project
@@ -62,7 +66,7 @@ activation_command_timeout: 180.0
 # line ending convention to use when writing source files.
 # Possible values: unset (use global setting), "lf", "crlf", or "native" (platform default)
 # This does not affect Serena's own files (e.g. memories and configuration files), which always use native line endings.
-line_ending:
+line_ending: "lf"
 
 # The language backend to use for this project.
 # If not set, the global setting from serena_config.yml is used.
@@ -113,7 +117,8 @@ ls_additional_workspace_folders: []
 #     - "**/bin/**"
 #     - "**/obj/**"
 # Note: global ignored_paths from serena_config.yml are also applied additively.
-ignored_paths: []
+ignored_paths:
+  - "DevcontainerFeatures-Output/**"
 
 # whether the project is in read-only mode
 # If set to true, all editing tools will be disabled and attempts to use them will result in an error
@@ -153,7 +158,7 @@ added_modes:
 
 # initial prompt for the project. It will always be given to the LLM upon activating the project
 # (contrary to the memories, which are loaded on demand).
-initial_prompt: ""
+initial_prompt: "Dev Container Features repo. Features are bash install scripts with a devcontainer-feature.json each. Commits follow Conventional Commits and run through lefthook and commitlint. Never skip hooks."
 
 # time budget (seconds) per tool call for the retrieval of additional symbol information
 # such as docstrings or parameter information.
