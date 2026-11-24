@@ -163,7 +163,8 @@ cmd_url() {
     err "Orca is not running; run: orca-server start"
     return 1
   fi
-  addr="$(resolve_address)" || return 1
+  # Orca already runs, so check Tailscale once and do not wait for it.
+  addr="$(TAILSCALE_WAIT_SECONDS=0 resolve_address)" || return 1
   out="$(orca-ide pair "${flag[@]}" --address "$addr" 2>&1)" || {
     err "orca-ide pair failed: $(printf '%s\n' "$out" | head -n 1)"
     return 1
