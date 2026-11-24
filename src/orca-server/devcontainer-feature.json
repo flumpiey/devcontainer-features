@@ -1,6 +1,6 @@
 {
   "id": "orca-server",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "name": "Orca server",
   "description": "Installs Orca (orca-ide) and serves it on your tailnet at container start.",
   "options": {
