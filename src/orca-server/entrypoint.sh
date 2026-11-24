@@ -24,6 +24,17 @@ if [ "$(id -u)" -eq 0 ] && [ -n "${user:-}" ]; then
 else
   chmod 0700 "$DATA_DIR" || log "cannot set mode of $DATA_DIR"
 fi
+# A non-root entrypoint cannot fix an owner that changed, for example after updateRemoteUserUID.
+data_dir_writable() {
+  if [ "$(id -u)" -eq 0 ] && [ -n "${user:-}" ]; then
+    runuser -u "$user" -- test -w "$DATA_DIR"
+  else
+    test -w "$DATA_DIR"
+  fi
+}
+unwritable=0
+data_dir_writable || unwritable=1
+
 : >"$LOG" || true
 log "$(stamp) entrypoint: start"
 for f in "$LOG" "$DATA_DIR/pairing-url.txt"; do
@@ -34,8 +45,14 @@ for f in "$LOG" "$DATA_DIR/pairing-url.txt"; do
   fi
 done
 
+if [ "$unwritable" = 1 ]; then
+  msg="error: $DATA_DIR is not writable by ${user:-$(id -un)}; Orca is not started"
+  log "$msg"
+  echo "orca-server: $msg" >&2
+fi
+
 # orca-server switches to the remote user itself when root runs it.
-if [ "${AUTO_START:-true}" = true ]; then
+if [ "${AUTO_START:-true}" = true ] && [ "$unwritable" = 0 ]; then
   ORCA_SERVER_LOG_FRESH=1 setsid /usr/local/bin/orca-server start >>"$LOG" 2>&1 </dev/null &
 fi
 

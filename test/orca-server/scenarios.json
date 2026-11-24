@@ -60,5 +60,13 @@
         "mobilePairing": false
       }
     }
+  },
+  "unwritable_data_dir": {
+    "image": "__BASE__",
+    "features": {
+      "orca-server": {
+        "pairingAddress": "127.0.0.1"
+      }
+    }
   }
 }

@@ -32,6 +32,19 @@ Put the Tailscale Feature in the same file. The Feature waits for Tailscale to r
 
 The remote user must not be root. Orca refuses public peers (`--refuse-public`). Set `pairingAddress` to skip the Tailscale wait.
 
+## Run as a non-root container user
+
+When you set `containerUser`, also set `"updateRemoteUserUID": false`. On a Linux host the dev container tool otherwise changes the user's UID and fixes only the home folder. The data folder `/var/lib/orca-server` keeps the old owner, and a non-root entrypoint cannot change it.
+
+When the data folder is not writable, the entrypoint logs one `orca-server: error:` line to `/var/lib/orca-server/orca-server.log` and to the container output. It does not start Orca and still runs the container command.
+
+```json
+{
+  "containerUser": "vscode",
+  "updateRemoteUserUID": false
+}
+```
+
 ## Commands
 
 | Command | Result |
