@@ -87,10 +87,77 @@ restart_replaces_link() {
   wait_for 90 has_fresh_link
 }
 
+# stop returns only after the exit is logged and the PID file is gone, so a restart cannot see a stale line.
+stop_waits_for_exit_line() {
+  wait_for 90 is_running || return 1
+  orca-server stop
+  has_exit_line && [ ! -e "$DATA/orca-server.pid" ]
+}
+
+# status runs while Orca exits. It must not remove the PID file before the exit line is logged.
+stop_with_status_polling() {
+  local poller rc=0
+  orca-server start
+  wait_for 90 is_running || return 1
+  (
+    for _ in $(seq 150); do
+      orca-server status >/dev/null || true
+      sleep 0.02
+    done
+  ) &
+  poller=$!
+  orca-server stop
+  { has_exit_line && [ ! -e "$DATA/orca-server.pid" ]; } || rc=1
+  wait "$poller" || true
+  return "$rc"
+}
+
+# Orca has just died and its watcher has not logged yet. stop waits for the watcher.
+stop_after_crash_waits() {
+  local watcher
+  orca-server start
+  wait_for 90 is_running || return 1
+  # Pause the watcher, kill Orca, and release the watcher one second later, while stop waits.
+  watcher="$(<"$DATA/orca-server.watcher")"
+  kill -STOP "$watcher"
+  kill -KILL "$(<"$DATA/orca-server.pid")"
+  sleep 0.3
+  (
+    sleep 1
+    kill -CONT "$watcher"
+  ) &
+  orca-server stop
+  has_exit_line && [ ! -e "$DATA/orca-server.pid" ]
+}
+
+# Same moment, then start. The old watcher must log before the new start truncates the log,
+# so the new log never holds the old exit line.
+start_after_crash_waits() {
+  local watcher
+  orca-server start
+  wait_for 90 is_running || return 1
+  watcher="$(<"$DATA/orca-server.watcher")"
+  kill -STOP "$watcher"
+  kill -KILL "$(<"$DATA/orca-server.pid")"
+  sleep 0.3
+  (
+    sleep 1
+    kill -CONT "$watcher"
+  ) &
+  orca-server start
+  wait_for 90 is_running || return 1
+  sleep 3
+  ! has_exit_line
+}
+
 check "status and stop report running then stopped" status_and_stop
 check "url prints one error and exits 1 when Orca is stopped" url_fails_cleanly
 check "a taken port is logged and leaves status stopped" port_conflict
 check "an Orca crash is logged" crash_is_logged
 check "a restart replaces the pairing link" restart_replaces_link
+check "stop returns after the exit is logged" stop_waits_for_exit_line
+check "stop still waits while status runs" stop_with_status_polling
+check "stop after a crash waits for the exit line" stop_after_crash_waits
+check "start after a crash keeps the old exit line out of the new log" start_after_crash_waits
 
 reportResults

@@ -90,7 +90,7 @@ scripts/verify.sh          # modes: fast, push, ci
 README.md
 ```
 
-Already present and kept: `package.json`, `package-lock.json`, `lefthook.yml`, `commitlint.config.mjs`.
+Already present and kept: `package.json`, `pnpm-lock.yaml`, `lefthook.yml`, `commitlint.config.mjs`.
 
 **Structure Decision**: the standard Feature repository layout from containers.dev. One Feature, no shared library.
 
@@ -101,7 +101,7 @@ Already present and kept: `package.json`, `package-lock.json`, `lefthook.yml`, `
 3. `--supervise` is not used, because it redacts the pairing line.
 4. One `serve` start prints one link kind. With `mobilePairing` true the printed link is the mobile link. See Decisions recorded, item 1.
 5. `release.yaml` needs `contents: write`, `pull-requests: write` and `packages: write`. Docs arrive as a pull request.
-6. Package manager stays npm, because `package-lock.json` exists. `commitlint.config.mjs` stays. Slice 1 does not create `commitlint.config.js`. Lefthook already has the `commit-msg` hook, so Slice 1 only adds `pre-commit`.
+6. Package manager is pnpm (2026-11-24: `pnpm-lock.yaml` replaced `package-lock.json`, and `pr-hygiene.yml` pins pnpm 12.3.4). `commitlint.config.mjs` stays. Slice 1 does not create `commitlint.config.js`. Lefthook already has the `commit-msg` hook, so Slice 1 only adds `pre-commit`.
 7. The default Orca version is `1.4.271`, the newest tag at 2026-11-23. The tag must pass the test suite before Slice 5 closes.
 8. `serve` always gets `--refuse-public` (Decision 15, research.md D10).
 9. The .deb gets a SHA-256 check (Decision 16, research.md D2). This replaces the earlier "no checksum" position.
@@ -120,7 +120,7 @@ These are also in spec.md, Decisions 14 to 20. Items 1 to 3 below cover Decision
 8. Test scope (Slice 4, below).
 9. Version bump procedure (FR-024). Change `DEFAULT_VERSION` and `DEFAULT_DEB_SHA256` in `install.sh` and the `version` and `debSha256` defaults in `devcontainer-feature.json` in one commit, with the new digest from `gh api repos/stablyai/orca/releases/tags/v<version>`. `verify.sh fast` fails when they differ. `test.sh` checks the installed version equals the default.
 10. Pins (FR-029). The devcontainer CLI, shellcheck, shfmt and every GitHub Action in CI are pinned to a full version or SHA. apt dependencies of the .deb are not pinned.
-11. Publish rules (FR-021, FR-030, FR-031). `test.yaml` has `contents: read` only and no secret, and runs the action with `validate-only` on pull requests. `release.yaml` needs the test workflow to pass. An unchanged version is skipped and the run succeeds, because the CLI skips an existing version. The README pull request is opened with `GITHUB_TOKEN`, so it starts no workflow. Dru runs `verify.sh ci` on its branch before merging. A bad version is withdrawn by publishing a fixed patch version. `NOTES.md` says how.
+11. Publish rules (FR-021, FR-030, FR-031). `test.yaml` has `contents: read` only and no secret, and runs the action with `validate-only` on pull requests. `release.yaml` needs the test workflow to pass. `test.yaml` runs on pull requests and through `release.yaml`, which runs on every push to main, so one push to main gives one test run. An unchanged version is skipped and the run succeeds, because the CLI skips an existing version. The README pull request is opened with `GITHUB_TOKEN`, so it starts no workflow. Dru runs `verify.sh ci` on its branch before merging. A bad version is withdrawn by publishing a fixed patch version. `NOTES.md` says how.
 12. Extra option checks (FR-028, convergence T068). `install.sh` also requires `mobilePairing` and `autoStart` to be `true` or `false`, `pairingAddress` to hold only letters, digits and `. _ : -`, and `debSha256` to be 64 hex digits. Kept: `orca-server` and the entrypoint source `options.env` as shell, so an unchecked value could run code. `build-fails.sh` tests the address filter.
 13. Action CLI pin (FR-029, convergence T060). The `devcontainers/action` steps set `devcontainer-cli-version` to the version in `verify.sh`, because the action defaults to the latest CLI.
 

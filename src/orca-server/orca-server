@@ -7,6 +7,7 @@ SHARE_DIR=/usr/local/share/orca-server
 DATA_DIR=/var/lib/orca-server
 LOG="$DATA_DIR/orca-server.log"
 PID_FILE="$DATA_DIR/orca-server.pid"
+WATCHER_FILE="$DATA_DIR/orca-server.watcher"
 LOCK="$DATA_DIR/orca-server.lock"
 URL_FILE="$DATA_DIR/pairing-url.txt"
 
@@ -69,11 +70,13 @@ running_pid() {
   local pid
   [ -f "$PID_FILE" ] || return 1
   pid="$(<"$PID_FILE")"
-  if [[ "$pid" =~ ^[0-9]+$ ]] && tr '\0' ' ' <"/proc/$pid/cmdline" 2>/dev/null | grep -q orca-ide; then
+  if [[ "$pid" =~ ^[0-9]+$ ]] && tr '\0' ' ' 2>/dev/null <"/proc/$pid/cmdline" | grep -q orca-ide; then
     echo "$pid"
     return 0
   fi
-  rm -f "$PID_FILE"
+  # Orca is gone but its watcher still runs: it logs the exit and then removes the files. Leave them.
+  if [ -f "$WATCHER_FILE" ] && kill -0 "$(<"$WATCHER_FILE")" 2>/dev/null; then return 1; fi
+  rm -f "$PID_FILE" "$WATCHER_FILE"
   return 1
 }
 
@@ -99,6 +102,7 @@ run_orca() {
   # Own session, so stop can signal Orca and its children. Close the lock descriptor.
   ORCA_SERVE_RUNTIME=orcad setsid orca-ide "${args[@]}" 9>&- &
   pid=$!
+  echo "$BASHPID" >"$WATCHER_FILE"
   echo "$pid" >"$PID_FILE"
   exec 9>&-
   while kill -0 "$pid" 2>/dev/null; do
@@ -109,6 +113,8 @@ run_orca() {
   done
   wait "$pid" || rc=$?
   log "orca-ide exited with status $rc"
+  # Marker first. Once the PID file is gone, stop and start know the marker is gone too.
+  if [ "$(cat "$WATCHER_FILE" 2>/dev/null)" = "$BASHPID" ]; then rm -f "$WATCHER_FILE"; fi
   if [ "$(cat "$PID_FILE" 2>/dev/null)" = "$pid" ]; then rm -f "$PID_FILE"; fi
 }
 
@@ -118,6 +124,8 @@ cmd_start() {
   exec 9>"$LOCK"
   flock -n 9 || return 0
   running_pid >/dev/null && return 0
+  # A watcher from the last run may still log the exit. Let it finish before the log is truncated.
+  pid_file_gone 100 || true
   if [ "${ORCA_SERVER_LOG_FRESH:-}" != 1 ]; then : >"$LOG"; fi
   addr="$(resolve_address)" || return 1
   rm -f "$URL_FILE"
@@ -131,19 +139,29 @@ cmd_start() {
   return 1
 }
 
-cmd_stop() {
-  local pid i
-  pid="$(running_pid)" || return 0
-  # The group signal reaches Orca's children. Fall back to the PID if it is no group leader.
-  kill -TERM -- "-$pid" 2>/dev/null || kill -TERM "$pid" 2>/dev/null || true
-  for ((i = 0; i < 100; i++)); do
-    kill -0 "$pid" 2>/dev/null || break
+# The watcher logs the exit and then removes the PID file. Wait up to $1 tenths of a second for that.
+pid_file_gone() {
+  local i
+  for ((i = 0; i < $1; i++)); do
+    if [ ! -f "$PID_FILE" ]; then return 0; fi
     sleep 0.1
   done
-  if kill -0 "$pid" 2>/dev/null; then
+  return 1
+}
+
+cmd_stop() {
+  local pid
+  # When Orca already exited, its watcher may still be logging the exit, so wait for it too.
+  pid="$(running_pid)" || {
+    pid_file_gone 100 || true
+    return 0
+  }
+  # The group signal reaches Orca's children. Fall back to the PID if it is no group leader.
+  kill -TERM -- "-$pid" 2>/dev/null || kill -TERM "$pid" 2>/dev/null || true
+  if ! pid_file_gone 100; then
     kill -KILL -- "-$pid" 2>/dev/null || kill -KILL "$pid" 2>/dev/null || true
+    pid_file_gone 50 || rm -f "$PID_FILE" # the watcher is gone
   fi
-  rm -f "$PID_FILE"
 }
 
 cmd_status() {
@@ -163,7 +181,8 @@ cmd_url() {
     err "Orca is not running; run: orca-server start"
     return 1
   fi
-  addr="$(resolve_address)" || return 1
+  # Orca already runs, so check Tailscale once and do not wait for it.
+  addr="$(TAILSCALE_WAIT_SECONDS=0 resolve_address)" || return 1
   out="$(orca-ide pair "${flag[@]}" --address "$addr" 2>&1)" || {
     err "orca-ide pair failed: $(printf '%s\n' "$out" | head -n 1)"
     return 1

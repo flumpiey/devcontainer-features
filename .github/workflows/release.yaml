@@ -1,9 +1,8 @@
 name: release
 on:
+  # Every push to main runs the tests once, here. test.yaml has no push trigger of its own.
   push:
     branches: [main]
-    paths:
-      - src/orca-server/**
 permissions:
   contents: read
 jobs:
