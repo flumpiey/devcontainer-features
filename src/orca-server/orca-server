@@ -7,6 +7,7 @@ SHARE_DIR=/usr/local/share/orca-server
 DATA_DIR=/var/lib/orca-server
 LOG="$DATA_DIR/orca-server.log"
 PID_FILE="$DATA_DIR/orca-server.pid"
+WATCHER_FILE="$DATA_DIR/orca-server.watcher"
 LOCK="$DATA_DIR/orca-server.lock"
 URL_FILE="$DATA_DIR/pairing-url.txt"
 
@@ -69,11 +70,13 @@ running_pid() {
   local pid
   [ -f "$PID_FILE" ] || return 1
   pid="$(<"$PID_FILE")"
-  if [[ "$pid" =~ ^[0-9]+$ ]] && tr '\0' ' ' <"/proc/$pid/cmdline" 2>/dev/null | grep -q orca-ide; then
+  if [[ "$pid" =~ ^[0-9]+$ ]] && tr '\0' ' ' 2>/dev/null <"/proc/$pid/cmdline" | grep -q orca-ide; then
     echo "$pid"
     return 0
   fi
-  rm -f "$PID_FILE"
+  # Orca is gone but its watcher still runs: it logs the exit and then removes the files. Leave them.
+  if [ -f "$WATCHER_FILE" ] && kill -0 "$(<"$WATCHER_FILE")" 2>/dev/null; then return 1; fi
+  rm -f "$PID_FILE" "$WATCHER_FILE"
   return 1
 }
 
@@ -99,6 +102,7 @@ run_orca() {
   # Own session, so stop can signal Orca and its children. Close the lock descriptor.
   ORCA_SERVE_RUNTIME=orcad setsid orca-ide "${args[@]}" 9>&- &
   pid=$!
+  echo "$BASHPID" >"$WATCHER_FILE"
   echo "$pid" >"$PID_FILE"
   exec 9>&-
   while kill -0 "$pid" 2>/dev/null; do
@@ -110,6 +114,7 @@ run_orca() {
   wait "$pid" || rc=$?
   log "orca-ide exited with status $rc"
   if [ "$(cat "$PID_FILE" 2>/dev/null)" = "$pid" ]; then rm -f "$PID_FILE"; fi
+  rm -f "$WATCHER_FILE"
 }
 
 cmd_start() {

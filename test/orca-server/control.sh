@@ -94,11 +94,30 @@ stop_waits_for_exit_line() {
   has_exit_line && [ ! -e "$DATA/orca-server.pid" ]
 }
 
+# status runs while Orca exits. It must not remove the PID file before the exit line is logged.
+stop_with_status_polling() {
+  local poller rc=0
+  orca-server start
+  wait_for 90 is_running || return 1
+  (
+    for _ in $(seq 150); do
+      orca-server status >/dev/null || true
+      sleep 0.02
+    done
+  ) &
+  poller=$!
+  orca-server stop
+  { has_exit_line && [ ! -e "$DATA/orca-server.pid" ]; } || rc=1
+  wait "$poller" || true
+  return "$rc"
+}
+
 check "status and stop report running then stopped" status_and_stop
 check "url prints one error and exits 1 when Orca is stopped" url_fails_cleanly
 check "a taken port is logged and leaves status stopped" port_conflict
 check "an Orca crash is logged" crash_is_logged
 check "a restart replaces the pairing link" restart_replaces_link
 check "stop returns after the exit is logged" stop_waits_for_exit_line
+check "stop still waits while status runs" stop_with_status_polling
 
 reportResults
