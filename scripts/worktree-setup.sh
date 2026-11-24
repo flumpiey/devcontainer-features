@@ -2,4 +2,4 @@
 # scripts/worktree-setup.sh
 set -euo pipefail
 cd "$ORCA_WORKTREE_PATH"
-if [ -f package-lock.json ]; then npm ci; fi
+if [ -f pnpm-lock.yaml ]; then pnpm install --frozen-lockfile; fi
