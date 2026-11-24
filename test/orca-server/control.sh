@@ -114,9 +114,18 @@ stop_with_status_polling() {
 
 # Orca has just died and its watcher has not logged yet. stop waits for the watcher.
 stop_after_crash_waits() {
+  local watcher
   orca-server start
   wait_for 90 is_running || return 1
+  # Pause the watcher, kill Orca, and release the watcher one second later, while stop waits.
+  watcher="$(<"$DATA/orca-server.watcher")"
+  kill -STOP "$watcher"
   kill -KILL "$(<"$DATA/orca-server.pid")"
+  sleep 0.3
+  (
+    sleep 1
+    kill -CONT "$watcher"
+  ) &
   orca-server stop
   has_exit_line && [ ! -e "$DATA/orca-server.pid" ]
 }
@@ -124,9 +133,17 @@ stop_after_crash_waits() {
 # Same moment, then start. The old watcher must log before the new start truncates the log,
 # so the new log never holds the old exit line.
 start_after_crash_waits() {
+  local watcher
   orca-server start
   wait_for 90 is_running || return 1
+  watcher="$(<"$DATA/orca-server.watcher")"
+  kill -STOP "$watcher"
   kill -KILL "$(<"$DATA/orca-server.pid")"
+  sleep 0.3
+  (
+    sleep 1
+    kill -CONT "$watcher"
+  ) &
   orca-server start
   wait_for 90 is_running || return 1
   sleep 3

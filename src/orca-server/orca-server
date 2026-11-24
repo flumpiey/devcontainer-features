@@ -113,8 +113,9 @@ run_orca() {
   done
   wait "$pid" || rc=$?
   log "orca-ide exited with status $rc"
-  if [ "$(cat "$PID_FILE" 2>/dev/null)" = "$pid" ]; then rm -f "$PID_FILE"; fi
+  # Marker first. Once the PID file is gone, stop and start know the marker is gone too.
   if [ "$(cat "$WATCHER_FILE" 2>/dev/null)" = "$BASHPID" ]; then rm -f "$WATCHER_FILE"; fi
+  if [ "$(cat "$PID_FILE" 2>/dev/null)" = "$pid" ]; then rm -f "$PID_FILE"; fi
 }
 
 cmd_start() {
