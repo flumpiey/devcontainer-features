@@ -28,8 +28,8 @@ fast() {
   local sh_files=()
   if [ "${#dirs[@]}" -gt 0 ]; then
     mapfile -t sh_files < <(
-      # Bash scripts without a .sh suffix are listed by path.
-      find "${dirs[@]}" -type f \( -name '*.sh' -o -path src/orca-server/orca-server -o -path test/_global/tailscale_stub/tailscale \) | sort
+      # Tracked files only. Bash scripts without a .sh suffix are listed by path.
+      git ls-files -- "${dirs[@]}" | grep -E '\.sh$|^src/orca-server/orca-server$|^test/_global/tailscale_stub/tailscale$' | sort
     )
   fi
   if [ "${#sh_files[@]}" -gt 0 ]; then
@@ -43,7 +43,7 @@ fast() {
 
   while IFS= read -r -d '' f; do
     jq empty "$f" || problem "invalid JSON: $f"
-  done < <(find . \( -name node_modules -o -name .git -o -name DevcontainerFeatures-Output \) -prune -o -type f -name '*.json' -print0)
+  done < <(git ls-files -z -- '*.json')
 
   # FR-024: the install.sh constants equal the JSON defaults.
   local install=src/orca-server/install.sh json=src/orca-server/devcontainer-feature.json
