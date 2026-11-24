@@ -90,7 +90,7 @@ scripts/verify.sh          # modes: fast, push, ci
 README.md
 ```
 
-Already present and kept: `package.json`, `package-lock.json`, `lefthook.yml`, `commitlint.config.mjs`.
+Already present and kept: `package.json`, `pnpm-lock.yaml`, `lefthook.yml`, `commitlint.config.mjs`.
 
 **Structure Decision**: the standard Feature repository layout from containers.dev. One Feature, no shared library.
 
