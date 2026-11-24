@@ -87,10 +87,18 @@ restart_replaces_link() {
   wait_for 90 has_fresh_link
 }
 
+# stop returns only after the exit is logged and the PID file is gone, so a restart cannot see a stale line.
+stop_waits_for_exit_line() {
+  wait_for 90 is_running || return 1
+  orca-server stop
+  has_exit_line && [ ! -e "$DATA/orca-server.pid" ]
+}
+
 check "status and stop report running then stopped" status_and_stop
 check "url prints one error and exits 1 when Orca is stopped" url_fails_cleanly
 check "a taken port is logged and leaves status stopped" port_conflict
 check "an Orca crash is logged" crash_is_logged
 check "a restart replaces the pairing link" restart_replaces_link
+check "stop returns after the exit is logged" stop_waits_for_exit_line
 
 reportResults
