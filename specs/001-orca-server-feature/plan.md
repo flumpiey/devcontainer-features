@@ -101,7 +101,7 @@ Already present and kept: `package.json`, `package-lock.json`, `lefthook.yml`, `
 3. `--supervise` is not used, because it redacts the pairing line.
 4. One `serve` start prints one link kind. With `mobilePairing` true the printed link is the mobile link. See Decisions recorded, item 1.
 5. `release.yaml` needs `contents: write`, `pull-requests: write` and `packages: write`. Docs arrive as a pull request.
-6. Package manager is pnpm (2026-11-24: `pnpm-lock.yaml` replaced `package-lock.json`, and `package.json` pins `packageManager`). `commitlint.config.mjs` stays. Slice 1 does not create `commitlint.config.js`. Lefthook already has the `commit-msg` hook, so Slice 1 only adds `pre-commit`.
+6. Package manager is pnpm (2026-11-24: `pnpm-lock.yaml` replaced `package-lock.json`, and `pr-hygiene.yml` pins pnpm 12.3.4). `commitlint.config.mjs` stays. Slice 1 does not create `commitlint.config.js`. Lefthook already has the `commit-msg` hook, so Slice 1 only adds `pre-commit`.
 7. The default Orca version is `1.4.271`, the newest tag at 2026-11-23. The tag must pass the test suite before Slice 5 closes.
 8. `serve` always gets `--refuse-public` (Decision 15, research.md D10).
 9. The .deb gets a SHA-256 check (Decision 16, research.md D2). This replaces the earlier "no checksum" position.
