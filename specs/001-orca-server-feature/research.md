@@ -30,7 +30,7 @@ Full sourced findings: [docs/analysis/261123-orca-server-feature.md](../../docs/
 ## D5. Launch command
 
 - Decision: `orca-ide serve --port <port> --pairing-address <addr> [--mobile-pairing] --refuse-public` (see D10), under `xvfb-run -a` only if no `DISPLAY` is set. Plain mode, not `--supervise`.
-- Rationale: Orca starts its own Xvfb when no display exists (spec context), so `xvfb-run` may be unneeded. Orca's own Docker test wraps the call in `xvfb-run -a`. Decide by test in Slice 3.
+- Rationale: Orca starts its own Xvfb when no display exists (spec context), so `xvfb-run` may be unneeded. Orca's own Docker test wraps the call in `xvfb-run -a`. Decided 2026-11-23 by test (T042): `orca-ide serve` runs with no `DISPLAY` in the Debian 12 test image and on all three bases in `local_address.sh`, using the orcad runtime. No `xvfb-run` wrapper.
 - Alternatives: `--bind <tailscale ip>` (rejected: `--mobile-pairing` needs all interfaces).
 
 ## D6. Pairing URL extraction

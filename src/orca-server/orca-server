@@ -1,0 +1,181 @@
+#!/usr/bin/env bash
+# src/orca-server/orca-server
+set -euo pipefail
+umask 077
+
+SHARE_DIR=/usr/local/share/orca-server
+DATA_DIR=/var/lib/orca-server
+LOG="$DATA_DIR/orca-server.log"
+PID_FILE="$DATA_DIR/orca-server.pid"
+LOCK="$DATA_DIR/orca-server.lock"
+URL_FILE="$DATA_DIR/pairing-url.txt"
+
+log() { echo "orca-server: $*" >>"$LOG"; }
+err() { echo "orca-server: error: $*" >&2; }
+usage() {
+  echo "usage: orca-server {start|stop|status|url [--mobile]}" >&2
+  exit 2
+}
+
+case "${1:-}:$#" in
+start:1 | stop:1 | status:1 | url:1 | url:2) ;;
+*) usage ;;
+esac
+if [ "$1" = url ] && [ "$#" -eq 2 ] && [ "$2" != --mobile ]; then usage; fi
+
+# Run as the remote user. --preserve-environment keeps ORCA_SERVER_LOG_FRESH, but it
+# also keeps HOME=/root, which Orca cannot read, so set the user's own HOME.
+if [ "$(id -u)" -eq 0 ]; then
+  user="$(cat "$SHARE_DIR/remote-user")"
+  home="$(getent passwd "$user" | cut -d: -f6)"
+  exec runuser --preserve-environment -u "$user" -- \
+    env HOME="$home" USER="$user" LOGNAME="$user" "$0" "$@"
+fi
+
+[ -r "$SHARE_DIR/options.env" ] || {
+  err "$SHARE_DIR/options.env is missing; the Feature install did not finish"
+  exit 1
+}
+# shellcheck source=/dev/null
+. "$SHARE_DIR/options.env"
+# Every path that runs orca-ide uses this data directory (FR-008).
+export ORCA_USER_DATA="$DATA_DIR"
+
+# FR-010, FR-011: print the address clients use.
+resolve_address() {
+  if [ -n "$PAIRING_ADDRESS" ]; then
+    printf '%s\n' "$PAIRING_ADDRESS"
+    return 0
+  fi
+  local deadline=$((SECONDS + TAILSCALE_WAIT_SECONDS)) json addr
+  while :; do
+    if json="$(timeout 5 tailscale status --json 2>/dev/null)" &&
+      [ "$(jq -r '.BackendState // empty' <<<"$json")" = Running ]; then
+      addr="$(jq -r '(.Self.DNSName // "" | rtrimstr(".")) as $dns | if $dns != "" then $dns else (.Self.TailscaleIPs[0] // "") end' <<<"$json")"
+      if [ -n "$addr" ]; then
+        printf '%s\n' "$addr"
+        return 0
+      fi
+    fi
+    if [ "$SECONDS" -ge "$deadline" ]; then break; fi
+    sleep 1
+  done
+  err "Tailscale is not Running after ${TAILSCALE_WAIT_SECONDS}s and pairingAddress is empty; set pairingAddress or start Tailscale"
+  return 1
+}
+
+# Print the PID when the PID file names a live orca-ide process. Remove a stale file.
+running_pid() {
+  local pid
+  [ -f "$PID_FILE" ] || return 1
+  pid="$(<"$PID_FILE")"
+  if [[ "$pid" =~ ^[0-9]+$ ]] && tr '\0' ' ' <"/proc/$pid/cmdline" 2>/dev/null | grep -q orca-ide; then
+    echo "$pid"
+    return 0
+  fi
+  rm -f "$PID_FILE"
+  return 1
+}
+
+# Print the link from the first complete "Pairing URL: " line of the log.
+find_pairing_url() {
+  local line
+  while IFS= read -r line; do
+    case "$line" in
+    "Pairing URL: "*)
+      printf '%s\n' "${line#Pairing URL: }"
+      return 0
+      ;;
+    esac
+  done <"$LOG"
+  return 1
+}
+
+# Background body of start: launch Orca, write its PID, copy the pairing link, log the exit.
+run_orca() {
+  local pid rc=0 url
+  local args=(serve --port "$PORT" --pairing-address "$1" --refuse-public)
+  if [ "$MOBILE_PAIRING" = true ]; then args+=(--mobile-pairing); fi
+  # Own session, so stop can signal Orca and its children. Close the lock descriptor.
+  ORCA_SERVE_RUNTIME=orcad setsid orca-ide "${args[@]}" 9>&- &
+  pid=$!
+  echo "$pid" >"$PID_FILE"
+  exec 9>&-
+  while kill -0 "$pid" 2>/dev/null; do
+    if [ ! -s "$URL_FILE" ] && url="$(find_pairing_url)"; then
+      printf '%s\n' "$url" >"$URL_FILE"
+    fi
+    sleep 1
+  done
+  wait "$pid" || rc=$?
+  log "orca-ide exited with status $rc"
+  if [ "$(cat "$PID_FILE" 2>/dev/null)" = "$pid" ]; then rm -f "$PID_FILE"; fi
+}
+
+cmd_start() {
+  local addr i
+  # FR-027: the lock covers the Tailscale wait and the launch.
+  exec 9>"$LOCK"
+  flock -n 9 || return 0
+  running_pid >/dev/null && return 0
+  if [ "${ORCA_SERVER_LOG_FRESH:-}" != 1 ]; then : >"$LOG"; fi
+  addr="$(resolve_address)" || return 1
+  rm -f "$URL_FILE"
+  log "starting orca-ide on port $PORT with pairing address $addr"
+  run_orca "$addr" >>"$LOG" 2>&1 </dev/null &
+  for ((i = 0; i < 50; i++)); do
+    if [ -s "$PID_FILE" ]; then return 0; fi
+    sleep 0.1
+  done
+  err "orca-ide did not start within 5 seconds; see $LOG"
+  return 1
+}
+
+cmd_stop() {
+  local pid i
+  pid="$(running_pid)" || return 0
+  # The group signal reaches Orca's children. Fall back to the PID if it is no group leader.
+  kill -TERM -- "-$pid" 2>/dev/null || kill -TERM "$pid" 2>/dev/null || true
+  for ((i = 0; i < 100; i++)); do
+    kill -0 "$pid" 2>/dev/null || break
+    sleep 0.1
+  done
+  if kill -0 "$pid" 2>/dev/null; then
+    kill -KILL -- "-$pid" 2>/dev/null || kill -KILL "$pid" 2>/dev/null || true
+  fi
+  rm -f "$PID_FILE"
+}
+
+cmd_status() {
+  if running_pid >/dev/null; then
+    echo running
+  else
+    echo stopped
+    return 3
+  fi
+}
+
+# FR-023: ask the running server for a link. Print the first orca://pair token.
+cmd_url() {
+  local flag=() addr out link
+  if [ "${1:-}" = --mobile ]; then flag=(--mobile); fi
+  if ! running_pid >/dev/null; then
+    err "Orca is not running; run: orca-server start"
+    return 1
+  fi
+  addr="$(resolve_address)" || return 1
+  out="$(orca-ide pair "${flag[@]}" --address "$addr" 2>&1)" || {
+    err "orca-ide pair failed: $(printf '%s\n' "$out" | head -n 1)"
+    return 1
+  }
+  link="$(printf '%s\n' "$out" | grep -o 'orca://pair[^[:space:]]*' | head -n 1 || true)"
+  if [ -z "$link" ]; then
+    err "orca-ide pair printed no orca://pair link"
+    return 1
+  fi
+  printf '%s\n' "$link"
+}
+
+cmd="$1"
+shift
+"cmd_$cmd" "$@"

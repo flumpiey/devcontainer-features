@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+set -euo pipefail
+# Stub: reports NoState for the first 15 seconds after the first call, then Running.
+marker=/var/tmp/tailscale-stub-first-call
+if [ ! -e "$marker" ]; then date +%s >"$marker"; fi
+if [ $(($(date +%s) - $(<"$marker"))) -lt 15 ]; then
+  echo '{"BackendState":"NoState"}'
+else
+  echo '{"BackendState":"Running","Self":{"DNSName":"host.tail1234.ts.net.","TailscaleIPs":["100.64.0.5"]}}'
+fi

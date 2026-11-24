@@ -1,0 +1,64 @@
+{
+  "local_address": {
+    "image": "__BASE__",
+    "features": {
+      "orca-server": {
+        "pairingAddress": "127.0.0.1"
+      }
+    }
+  },
+  "pairing_files": {
+    "image": "__BASE__",
+    "features": {
+      "orca-server": {
+        "pairingAddress": "127.0.0.1"
+      }
+    }
+  },
+  "control": {
+    "image": "__BASE__",
+    "features": {
+      "orca-server": {
+        "pairingAddress": "127.0.0.1"
+      }
+    }
+  },
+  "no_tailscale": {
+    "image": "__BASE__",
+    "features": {
+      "orca-server": {
+        "pairingAddress": "",
+        "tailscaleWaitSeconds": "3"
+      }
+    }
+  },
+  "install_twice": {
+    "image": "__BASE__",
+    "features": {
+      "orca-server": {
+        "pairingAddress": "127.0.0.1",
+        "autoStart": false
+      }
+    }
+  },
+  "non_root": {
+    "image": "__BASE__",
+    "containerUser": "vscode",
+    "updateRemoteUserUID": false,
+    "features": {
+      "orca-server": {
+        "pairingAddress": "127.0.0.1"
+      }
+    }
+  },
+  "no_autostart": {
+    "image": "__BASE__",
+    "features": {
+      "orca-server": {
+        "pairingAddress": "127.0.0.1",
+        "autoStart": false,
+        "mobilePairing": false
+      }
+    }
+  }
+}

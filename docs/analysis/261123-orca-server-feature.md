@@ -62,14 +62,15 @@ Not verified: how several Feature entrypoints chain. The spec text found gives o
 - Action inputs include `publish-features`, `base-path-to-features`, `generate-docs`, `oci-registry`, `features-namespace`, `validate-only`, `disable-schema-validation`, `disable-repo-tagging`, `devcontainer-cli-version`. Source: https://github.com/devcontainers/action/blob/main/action.yml
 - Required workflow permissions: `packages: write`, `contents: write`, `pull-requests: write`. Docs are generated into a pull request, not pushed to main. The repo setting "Allow GitHub Actions to create and approve pull requests" must be on. Source: https://github.com/devcontainers/action/blob/main/README.md
 - `devcontainer features test -f <feature> --base-image <image> .` runs `test/<feature>/test.sh`. `scenarios.json` maps a scenario name to a devcontainer.json snippet. The scenario passes when the container builds and `test/<feature>/<scenario>.sh` exits 0. Extra files in `test/<feature>/<scenario>/` are copied into the build folder. Source: https://github.com/devcontainers/cli/blob/main/docs/features/test.md
-- `test/_global/` is for scenarios that combine Features. It is needed here only for the Tailscale ordering and entrypoint chaining scenario. Not verified: the exact `_global` layout. Plan action: confirm it with `devcontainer features test --global-scenarios-only` documentation at implementation time.
+- `test/_global/` is for scenarios that combine Features. It is needed here only for the Tailscale ordering and entrypoint chaining scenario.
+- Verified 2026-11-23 with CLI 0.88.0 (T031). `test/_global/scenarios.json` holds the scenarios and `test/_global/<scenario>.sh` is the check script. Run it with `devcontainer features test -p . --global-scenarios-only`. A scenario can set `build.dockerfile`, and the Dockerfile and its files sit in `test/_global/<scenario>/`. Scenario containers run the Feature entrypoints. The scenario `image` is not set by `--base-image`, so `verify.sh` writes a copy of `scenarios.json` with `__BASE__` replaced. Scenarios use `containerUser` to run as a non-root user. The harness mounts the Feature files at `/workspaces/<id>/.devcontainer/orca-server/` inside the container, which `install_twice.sh` uses.
 
 ## R7. Claude Code attribution settings
 
 - `attribution` in settings.json replaces the deprecated `includeCoAuthoredBy`. It customises commit and PR bylines. Source: https://github.com/anthropics/claude-code/blob/main/CHANGELOG.md
 - `"attribution": false` hides all attribution, but older CLI versions skip a settings file that holds it. Keep the object form in shared files. Same source.
 - `attribution.sessionUrl` omits the claude.ai session link. Same source.
-- Not verified: the exact keys of the object form for an empty commit and PR byline. The plan uses `{"attribution": {"commit": "", "pr": ""}}` and requires a check against the installed CLI before Slice 1 ends.
+- Verified 2026-11-23 against Claude Code 2.1.330 and https://code.claude.com/docs/en/settings-reference.md: the object keys are `commit` (string), `pr` (string) and `sessionUrl` (boolean, default `true`). An empty string hides that byline. `.claude/settings.json` sets `commit` and `pr` to `""` and `sessionUrl` to `false`.
 
 ## Plan changes
 
@@ -84,3 +85,14 @@ Not verified: how several Feature entrypoints chain. The spec text found gives o
 
 - Install format. The server-only tarball is 60 MB against 212 MB, needs no GTK, X11, Xvfb, python3 or xdotool, and has a published checksum. Decision 3 and acceptance criterion 2 fix the .deb and Xvfb. Recommendation: keep the .deb for 1.0.0, because criterion 2 requires `xvfb-run`. Consider the tarball for 2.0.0.
 - Public-address policy. Recommendation: pass `--refuse-public` always. Cost: a client on a non-private path cannot connect. For a tailnet-only setup this is correct.
+
+## Implementation results (2026-11-23)
+
+- T047: `bash scripts/verify.sh ci` exits 0 on `mcr.microsoft.com/devcontainers/base:bookworm`, `:jammy` and `:noble`. It ran the default test, the six scenarios on each base, the `_global` scenario, `build-fails.sh` and `secrets_scan.sh`. CLI 0.88.0, Docker Desktop on Windows 11. Quickstart steps 1 to 3 also pass (`verify.sh fast`, `push`, `ci`).
+- Entrypoint chaining (research D7, T038): passes. The Orca entrypoint and the `ghcr.io/devcontainers/features/sshd:1` entrypoint both ran in one container (`tailscale_stub` scenario). The stub reported Running 15 s after its first call, and the pairing link appeared after that.
+- `attribution` keys (T003): verified, see R7.
+- `pair` output token (T026): `orca-ide pair` prints a prose line, the `orca://pair` link and a browser URL. `--mobile` also prints a QR code. The first `orca://pair` token is the link for both forms.
+- Restart link: `orca-ide serve` prints the same unused link again after a restart, so the test plants a stale line and expects it replaced.
+- `runuser --preserve-environment` keeps `HOME=/root`, which Orca cannot read. `orca-server` sets the remote user's `HOME`.
+- Not verified: `ORCA_USER_DATA` under the Electron fallback. All runs used the orcad runtime (`ORCA_SERVE_RUNTIME=orcad`). Grants across a rebuild with a real client are manual (T055).
+- Not run: the GitHub workflows (`test.yaml`, `release.yaml`). `actionlint` 1.7.7 reports no findings.
