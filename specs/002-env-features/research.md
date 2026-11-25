@@ -12,9 +12,9 @@ Date: 2026-11-25. Anchor findings are in `docs/analysis/261123-env-features.md`.
 
 ## R2. Workspace folder name
 
-- Decision: the Feature declares `containerEnv` `TAILNET_WORKSPACE=${containerWorkspaceFolderBasename}`. The entrypoint reads it. If it is empty or still holds the literal `${`, the entrypoint takes the single directory under `/workspaces`. If neither works, it logs one line and skips the join.
+- Decision (changed by the slice 4 test, 2026-11-25): the entrypoint takes the single directory under `/workspaces`. A repo with another workspace folder sets `TAILNET_WORKSPACE` in its own `devcontainer.json` `containerEnv`, with the value `${containerWorkspaceFolderBasename}`, and the entrypoint prefers it. If neither works, it logs one line and skips the join.
 - `${containerWorkspaceFolderBasename}` is the base name of the workspace folder path in the container. The substitution code returns `path.posix.basename(containerWorkspaceFolder)`. Sources: https://github.com/devcontainers/spec/blob/main/docs/specs/devcontainerjson-reference.md (variables table), `devcontainers/cli` v0.88.0 `src/spec-common/variableSubstitution.ts` lines 109 to 110.
-- The CLI wraps image metadata in `addSubstitution` before the container is created (`src/spec-node/utils.ts` lines 163 to 170). That makes substitution in Feature `containerEnv` likely. It is not proven by reading. The slice 4 test proves it and the fallback covers a miss.
+- The CLI wraps image metadata in `addSubstitution` before the container is created (`src/spec-node/utils.ts` lines 163 to 170). That made substitution in a Feature `containerEnv` look likely. The slice 4 test showed it is not: a Feature `containerEnv` becomes a Dockerfile `ENV` line, Docker expands `${containerWorkspaceFolderBasename}` to nothing at build, and `TAILNET_WORKSPACE` was empty in the test container. The `/workspaces` fallback gave the right folder. The Feature therefore declares no `containerEnv`.
 - Alternatives: read `$PWD` (rejected: the wrapper's working directory is the image `WORKDIR`, not the workspace); an option (rejected: the user must not repeat the folder name).
 
 ## R3. Upstream Tailscale Feature

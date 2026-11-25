@@ -25,7 +25,7 @@ The input listed only `test.sh` and `scenarios.json`. The other scripts are the 
 | `id`, `version` | `tailnet`, `1.0.0` |
 | `dependsOn` | `ghcr.io/tailscale/codespace/tailscale:1` with option `version` `1.104.7` (spec FR-031) |
 | `entrypoint` | `/usr/local/share/tailnet/entrypoint.sh` |
-| `containerEnv` | `TAILNET_WORKSPACE=${containerWorkspaceFolderBasename}` |
+| `containerEnv` | none. A repo may set `TAILNET_WORKSPACE` itself (research R2). |
 | `capAdd` | none (the dependency declares `NET_ADMIN`, `NET_RAW`, `MKNOD`) |
 
 Options:

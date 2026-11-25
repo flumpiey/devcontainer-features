@@ -1,0 +1,22 @@
+diff --git a/src/orca-server/devcontainer-feature.json b/src/orca-server/devcontainer-feature.json
+index fa1af55..03f57ff 100644
+--- a/src/orca-server/devcontainer-feature.json
++++ b/src/orca-server/devcontainer-feature.json
+@@ -1,6 +1,6 @@
+ {
+   "id": "orca-server",
+-  "version": "1.0.1",
++  "version": "1.0.2",
+   "name": "Orca server",
+   "description": "Installs Orca (orca-ide) and serves it on your tailnet at container start.",
+   "options": {
+@@ -42,7 +42,8 @@
+   },
+   "installsAfter": [
+     "ghcr.io/tailscale/codespace/tailscale",
+-    "ghcr.io/devcontainers-extra/features/tailscale"
++    "ghcr.io/devcontainers-extra/features/tailscale",
++    "ghcr.io/flumpiey/devcontainer-features/tailnet"
+   ],
+   "entrypoint": "/usr/local/share/orca-server/entrypoint.sh",
+   "mounts": [

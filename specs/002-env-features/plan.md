@@ -86,10 +86,10 @@ src/
 └── ts7-cli/        {devcontainer-feature.json, install.sh, NOTES.md}
 test/
 ├── _global/        # unchanged
-├── tailnet/        {test.sh, scenarios.json, install_twice.sh, secrets_scan.sh, build-fails.sh,
+├── tailnet/        {test.sh, lib.sh, scenarios.json, install_twice.sh, secrets_scan.sh, build-fails.sh,
 │                    key_unset.sh, folder_name.sh, already_up.sh, daemon_down.sh, custom_key_var.sh,
 │                    key_refused.sh, overlap.sh, non_root.sh,
-│                    stub/{Dockerfile, tailscale}}
+│                    stub/tailscale}
 ├── node-guard/     {test.sh, scenarios.json, install_twice.sh, build-fails.sh, remote_env_override.sh}
 └── ts7-cli/        {test.sh, scenarios.json, install_twice.sh, build-fails.sh, other_version.sh}
 scripts/verify.sh   # edit: Feature discovery
@@ -148,7 +148,7 @@ Files: `src/tailnet/*`, `test/tailnet/*`, `test/_global/tailscale_stub/*`, `src/
 
 1. `devcontainer-feature.json`, `install.sh` (OS check, option checks, write `options.env`, install `entrypoint.sh`), `NOTES.md` with the `runArgs` line, the `containerEnv` line and the upstream blocking note.
 2. `entrypoint.sh`: compute hostname; start the join in `( ... ) &`; end with `exec "$@"`. The subshell waits up to 30 seconds for `tailscale status --json` to answer, reads the key from `${!AUTH_KEY_VAR}`, writes it to `/run/tailnet/authkey` only when state is `NeedsLogin` or empty, takes a lock, re-runs under `sudo` when not root, runs `tailscale up --reset --accept-routes --ssh --hostname=... --advertise-tags=... [--auth-key=file:...]`, removes the file, logs the outcome.
-3. Stub: `test/tailnet/stub/tailscale` records its arguments to `/var/log/tailscale-stub.args` and reports state from a file. Its Dockerfile puts the stub in `/opt/tailscale-stub` and sets `ENV PATH=/opt/tailscale-stub:$PATH`. `test/_global/` stays unchanged. The upstream Feature keeps its real binary in `/usr/local/bin`. Upstream calls it by absolute path, tailnet by name. The scenarios use the key `test-auth-key`, which makes the upstream entrypoint skip its own join.
+3. Stub: `test/tailnet/stub/tailscale` records its arguments to `/var/log/tailscale-stub.args` and reports state from a file. `test/tailnet/lib.sh` installs it at `/usr/local/sbin/tailscale` in the test container, ahead of the real binary in `PATH` and in the `sudo` path. There is no stub Dockerfile. `test/_global/` stays unchanged. The upstream Feature keeps its real binary in `/usr/local/bin`. Upstream calls it by absolute path, tailnet by name. The scenarios use the key `test-auth-key`, which makes the upstream entrypoint skip its own join.
 4. `test.sh` and `scenarios.json` cover: AC1 arguments (hostname, tags, `--ssh`) with the stub; AC2 (key unset, one log line, shell opens); spaces and capitals in the folder name; already up under another hostname; `tailscaled` down (stub exits 1) still reaches `exec`; custom `authKeyVar`.
 5. `secrets_scan.sh` (AC3, FR-027): export a canary `tskey-auth-CANARY...` in the host environment, build, grep `docker history --no-trunc`, the options file and the image for the canary and for `tskey-`. A second pass plants the canary in a file in a scratch image and expects the scan to fail.
 6. `install_twice.sh` (AC6), `build-fails.sh` (AC7 and option errors).
@@ -163,6 +163,7 @@ Hard stop: `bash scripts/verify.sh ci` prints `verify: ci ok` with four Features
 - Measured 2026-11-25: `bash scripts/verify.sh ci` with orca-server only took 924 seconds (15.4 minutes), run after the slice 1 edits; the work is the same as before them. Four Features give about 62 minutes if run time scales with Feature count, inside the 120 minute limit.
 - `ci` run time grows about fourfold for the scenario part. The 120 minute job limit in `test.yaml` may not hold. Slice 4 measures it and FR-035 sets the rule: above 90 minutes, Dru approves any change to the limit.
 - `${containerWorkspaceFolderBasename}` in a Feature `containerEnv` is likely, not proven. Slice 4 tests it and falls back to `/workspaces/*`.
+- The devcontainer CLI resolves every `installsAfter` reference from the registry (`Could not resolve Feature manifest`). orca-server cannot name `tailnet` until `tailnet` is published, or its tests fail. Slice 4 therefore leaves orca-server unchanged. The edit is saved as `orca-server-installsafter.patch` and lands in a second change, after the release that first publishes `tailnet`.
 - A tagged join needs `tag:devcontainer` in the tailnet policy with the right tag owners. Out of scope, and the log shows the refusal.
 
 ## Complexity Tracking
