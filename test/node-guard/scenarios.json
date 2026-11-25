@@ -1,0 +1,17 @@
+{
+  "remote_env_override": {
+    "image": "__BASE__",
+    "remoteEnv": {
+      "NX_PARALLEL": "3"
+    },
+    "features": {
+      "node-guard": {}
+    }
+  },
+  "install_twice": {
+    "image": "__BASE__",
+    "features": {
+      "node-guard": {}
+    }
+  }
+}
