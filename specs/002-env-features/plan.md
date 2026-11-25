@@ -160,6 +160,7 @@ Hard stop: `bash scripts/verify.sh ci` prints `verify: ci ok` with four Features
 ## Risks
 
 - AC1 as written needs a real tailnet. FR-033 defines two proof levels: CI proves the `tailscale up` arguments with a stub, and one manual run from `quickstart.md` proves the join. The manual run needs Dru's key and is task T045.
+- Measured 2026-11-25: `bash scripts/verify.sh ci` with orca-server only took 924 seconds (15.4 minutes), run after the slice 1 edits; the work is the same as before them. Four Features give about 62 minutes if run time scales with Feature count, inside the 120 minute limit.
 - `ci` run time grows about fourfold for the scenario part. The 120 minute job limit in `test.yaml` may not hold. Slice 4 measures it and FR-035 sets the rule: above 90 minutes, Dru approves any change to the limit.
 - `${containerWorkspaceFolderBasename}` in a Feature `containerEnv` is likely, not proven. Slice 4 tests it and falls back to `/workspaces/*`.
 - A tagged join needs `tag:devcontainer` in the tailnet policy with the right tag owners. Out of scope, and the log shows the refusal.

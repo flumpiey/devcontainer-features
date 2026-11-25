@@ -12,8 +12,8 @@
 
 ## Phase 1: Setup
 
-- [ ] T001 Confirm branch `002-env-features` and a clean `bash scripts/verify.sh fast` in `scripts/verify.sh` before any edit. (Constitution VIII)
-- [ ] T002 Time `bash scripts/verify.sh ci` with orca-server only. Write the minutes under Risks in `specs/002-env-features/plan.md` (FR-035).
+- [X] T001 Confirm branch `002-env-features` and a clean `bash scripts/verify.sh fast` in `scripts/verify.sh` before any edit. (Constitution VIII)
+- [X] T002 Time `bash scripts/verify.sh ci` with orca-server only. Write the minutes under Risks in `specs/002-env-features/plan.md` (FR-035).
 
 ## Phase 2: Foundational. Generalise verify.sh (plan slice 1, serves US4)
 
@@ -21,16 +21,16 @@
 
 **Independent test**: `bash scripts/verify.sh ci` still prints `verify: ci ok` with orca-server only.
 
-- [ ] T003 Add `features()` to `scripts/verify.sh`. It prints the directory name of each `src/*/devcontainer-feature.json`, sorted. Print nothing when `src/` is absent (FR-022).
-- [ ] T004 In `fast()` of `scripts/verify.sh`, change the shell-file pattern to `\.sh$|^src/[^/]+/[^/.]+$|^test/.*/tailscale$`. This keeps `orca-server/orca-server` and admits `test/tailnet/stub/tailscale`. (FR-021)
-- [ ] T005 In `fast()` of `scripts/verify.sh`, replace the orca-server constant check with a loop over `features`. For each option with a `default` in the JSON, if `install.sh` has the line `DEFAULT_<UPPER_SNAKE option>=`, the value must equal the default. Check only where the constant exists. orca-server keeps `version` and `debSha256` (FR-031).
-- [ ] T006 In `fast()` of `scripts/verify.sh`, fail with one `problem` line if `.github/workflows/release.yaml` has a `paths:` key that does not list `src/**` (AC10, FR-024).
-- [ ] T007 In `fast()` of `scripts/verify.sh`, fail with one `problem` line per Feature that lacks `test/<id>/test.sh` or `test/<id>/scenarios.json` (FR-022).
-- [ ] T008 In `fast()` of `scripts/verify.sh`, fail with one `problem` line per `dependsOn` entry in any Feature JSON whose `version` option is missing, `latest` or `lts`, or whose reference has no `:<major>` tag (FR-031).
-- [ ] T009 In `scripts/verify.sh`, make `default_test` and `scenarios` take the Feature id as the first argument and the base as the second. `scenarios` copies `test/<id>` and returns 0 when `test/<id>/scenarios.json` is absent. (FR-022)
-- [ ] T010 In the `ci` branch of `scripts/verify.sh`, loop Features then bases for `default_test` and `scenarios`. Run `dc features test -p . --global-scenarios-only` once. Then run `test/<id>/build-fails.sh` and `test/<id>/secrets_scan.sh` for each Feature where the file exists. Update the `push` branch to test every Feature on bookworm (FR-022, FR-023).
-- [ ] T011 Extend `test/verify-fast-untracked.sh` with four cases in a temp repo: a `release.yaml` with `paths: ['src/orca-server/**']` fails `fast`; one with `paths: ['src/**']` passes; a Feature with no `test.sh` fails; a `dependsOn` entry with `"version": "latest"` fails. (FR-022, FR-024, FR-031)
-- [ ] T012 HARD STOP. Run `bash test/verify-fast-untracked.sh`, `bash scripts/verify.sh fast` and `bash scripts/verify.sh ci`. All pass with orca-server only. Stage the slice. Give Dru the commit message. Do not start Phase 3. (Constitution VIII)
+- [X] T003 Add `features()` to `scripts/verify.sh`. It prints the directory name of each `src/*/devcontainer-feature.json`, sorted. Print nothing when `src/` is absent (FR-022).
+- [X] T004 In `fast()` of `scripts/verify.sh`, change the shell-file pattern to `\.sh$|^src/[^/]+/[^/.]+$|^test/.*/tailscale$`. This keeps `orca-server/orca-server` and admits `test/tailnet/stub/tailscale`. (FR-021)
+- [X] T005 In `fast()` of `scripts/verify.sh`, replace the orca-server constant check with a loop over `features`. For each option with a `default` in the JSON, if `install.sh` has the line `DEFAULT_<UPPER_SNAKE option>=`, the value must equal the default. Check only where the constant exists. orca-server keeps `version` and `debSha256` (FR-031).
+- [X] T006 In `fast()` of `scripts/verify.sh`, fail with one `problem` line if `.github/workflows/release.yaml` has a `paths:` key that does not list `src/**` (AC10, FR-024).
+- [X] T007 In `fast()` of `scripts/verify.sh`, fail with one `problem` line per Feature that lacks `test/<id>/test.sh` or `test/<id>/scenarios.json` (FR-022).
+- [X] T008 In `fast()` of `scripts/verify.sh`, fail with one `problem` line per `dependsOn` entry in any Feature JSON whose `version` option is missing, `latest` or `lts`, or whose reference has no `:<major>` tag (FR-031).
+- [X] T009 In `scripts/verify.sh`, make `default_test` and `scenarios` take the Feature id as the first argument and the base as the second. `scenarios` copies `test/<id>` and returns 0 when `test/<id>/scenarios.json` is absent. (FR-022)
+- [X] T010 In the `ci` branch of `scripts/verify.sh`, loop Features then bases for `default_test` and `scenarios`. Run `dc features test -p . --global-scenarios-only` once. Then run `test/<id>/build-fails.sh` and `test/<id>/secrets_scan.sh` for each Feature where the file exists. Update the `push` branch to test every Feature on bookworm (FR-022, FR-023).
+- [X] T011 Extend `test/verify-fast-untracked.sh` with four cases in a temp repo: a `release.yaml` with `paths: ['src/orca-server/**']` fails `fast`; one with `paths: ['src/**']` passes; a Feature with no `test.sh` fails; a `dependsOn` entry with `"version": "latest"` fails. (FR-022, FR-024, FR-031)
+- [X] T012 HARD STOP. Run `bash test/verify-fast-untracked.sh`, `bash scripts/verify.sh fast` and `bash scripts/verify.sh ci`. All pass with orca-server only. Stage the slice. Give Dru the commit message. Do not start Phase 3. (Constitution VIII)
 
 ## Phase 3: User Story 2, node-guard (Priority: P1)
 
