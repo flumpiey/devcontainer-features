@@ -1,0 +1,16 @@
+{
+  "other_version": {
+    "image": "__BASE__",
+    "features": {
+      "ts7-cli": {
+        "version": "7.0.1-rc"
+      }
+    }
+  },
+  "install_twice": {
+    "image": "__BASE__",
+    "features": {
+      "ts7-cli": {}
+    }
+  }
+}
