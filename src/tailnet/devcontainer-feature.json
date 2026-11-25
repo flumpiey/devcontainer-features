@@ -1,0 +1,34 @@
+{
+  "id": "tailnet",
+  "version": "1.0.0",
+  "name": "Tailnet",
+  "description": "Joins the dev container to your tailnet at container start, with Tailscale SSH, a tag and the hostname <prefix>-<folder>-dev. Configures the Tailscale Feature; it does not install Tailscale.",
+  "options": {
+    "hostnamePrefix": {
+      "type": "string",
+      "default": "",
+      "description": "Prefix of the hostname. Empty means the container variable HOSTNAME_PREFIX. If that is also empty, the hostname is <folder>-dev. Letters, digits and hyphens only."
+    },
+    "tags": {
+      "type": "string",
+      "default": "tag:devcontainer",
+      "description": "Comma-separated Tailscale tags to advertise, each like tag:devcontainer. The tailnet policy must let the key own them."
+    },
+    "authKeyVar": {
+      "type": "string",
+      "default": "TS_AUTH_KEY",
+      "description": "Name of the container environment variable that holds the auth key at container start. The key is never stored in the image."
+    },
+    "ssh": {
+      "type": "boolean",
+      "default": true,
+      "description": "Turn Tailscale SSH on. Tested with the Tailscale Feature 1.0.8 and Tailscale 1.104.7."
+    }
+  },
+  "dependsOn": {
+    "ghcr.io/tailscale/codespace/tailscale:1": {
+      "version": "1.104.7"
+    }
+  },
+  "entrypoint": "/usr/local/share/tailnet/entrypoint.sh"
+}

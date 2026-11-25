@@ -1,0 +1,60 @@
+{
+  "key_unset": {
+    "image": "__BASE__",
+    "features": {
+      "tailnet": {}
+    }
+  },
+  "folder_name": {
+    "image": "__BASE__",
+    "features": {
+      "tailnet": {}
+    }
+  },
+  "already_up": {
+    "image": "__BASE__",
+    "features": {
+      "tailnet": {}
+    }
+  },
+  "daemon_down": {
+    "image": "__BASE__",
+    "features": {
+      "tailnet": {}
+    }
+  },
+  "custom_key_var": {
+    "image": "__BASE__",
+    "features": {
+      "tailnet": {
+        "authKeyVar": "MY_TS_KEY"
+      }
+    }
+  },
+  "key_refused": {
+    "image": "__BASE__",
+    "features": {
+      "tailnet": {}
+    }
+  },
+  "overlap": {
+    "image": "__BASE__",
+    "features": {
+      "tailnet": {}
+    }
+  },
+  "non_root": {
+    "image": "__BASE__",
+    "containerUser": "vscode",
+    "updateRemoteUserUID": false,
+    "features": {
+      "tailnet": {}
+    }
+  },
+  "install_twice": {
+    "image": "__BASE__",
+    "features": {
+      "tailnet": {}
+    }
+  }
+}
