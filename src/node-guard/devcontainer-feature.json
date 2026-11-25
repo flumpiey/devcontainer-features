@@ -1,0 +1,12 @@
+{
+  "id": "node-guard",
+  "version": "1.0.0",
+  "name": "Node guard",
+  "description": "Caps Node heap, Nx parallelism, the Nx daemon and Vitest workers for every process in the container. No options. Override a value in devcontainer.json remoteEnv.",
+  "containerEnv": {
+    "NODE_OPTIONS": "--max-old-space-size=2048",
+    "NX_PARALLEL": "1",
+    "NX_DAEMON": "false",
+    "VITEST_MAX_WORKERS": "1"
+  }
+}

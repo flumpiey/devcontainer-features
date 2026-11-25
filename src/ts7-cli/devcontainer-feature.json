@@ -1,0 +1,18 @@
+{
+  "id": "ts7-cli",
+  "version": "1.0.0",
+  "name": "TypeScript 7 CLI",
+  "description": "Installs the TypeScript 7 CLI as the command tsc7, in its own prefix. The repo's own tsc and TypeScript 6 stay untouched.",
+  "options": {
+    "version": {
+      "type": "string",
+      "default": "7.0.2",
+      "description": "TypeScript package version behind tsc7. The default, 7.0.2, is the tested version, with Node 26.13.1. The value latest is not tested."
+    }
+  },
+  "dependsOn": {
+    "ghcr.io/devcontainers/features/node:1": {
+      "version": "26.13.1"
+    }
+  }
+}

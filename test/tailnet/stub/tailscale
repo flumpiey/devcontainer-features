@@ -1,0 +1,29 @@
+#!/usr/bin/env bash
+set -euo pipefail
+# test/tailnet/stub/tailscale
+# Stub for the tailnet tests. It records every `up` call and keeps a backend state in a file.
+# TAILSCALE_STUB_MODE=down makes status fail, as if tailscaled did not run.
+# TAILSCALE_STUB_MODE=refuse makes up fail, as if the control server refused the tag.
+# TAILSCALE_STUB_SLEEP=<seconds> makes up take that long.
+ARGS=/var/log/tailscale-stub.args
+STATE_FILE=/var/tmp/tailscale-stub-state
+
+case "${1:-}" in
+status)
+  if [ "${TAILSCALE_STUB_MODE:-}" = down ]; then
+    echo "failed to connect to local tailscaled" >&2
+    exit 1
+  fi
+  printf '{\n  "BackendState": "%s"\n}\n' "$(cat "$STATE_FILE" 2>/dev/null || echo NeedsLogin)"
+  ;;
+up)
+  printf '%s\n' "$*" >>"$ARGS"
+  sleep "${TAILSCALE_STUB_SLEEP:-0}"
+  if [ "${TAILSCALE_STUB_MODE:-}" = refuse ]; then
+    echo "backend error: requested tags [tag:devcontainer] are invalid or not permitted" >&2
+    exit 1
+  fi
+  echo Running >"$STATE_FILE"
+  ;;
+*) ;;
+esac
