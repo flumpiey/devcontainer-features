@@ -51,6 +51,14 @@
       "tailnet": {}
     }
   },
+  "no_sudo": {
+    "image": "__BASE__",
+    "containerUser": "vscode",
+    "updateRemoteUserUID": false,
+    "features": {
+      "tailnet": {}
+    }
+  },
   "install_twice": {
     "image": "__BASE__",
     "features": {

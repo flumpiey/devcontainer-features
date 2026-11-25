@@ -133,3 +133,18 @@ Not ticked:
 - T042: blocked. The CLI cannot resolve `installsAfter` to the unpublished `tailnet` (`Could not resolve Feature manifest`). The change is in `orca-server-installsafter.patch`.
 - T047: the checklists are all ticked, but the review with Dru has not happened.
 - T049: AC9 has no passing check until T042 lands.
+
+## Phase 7: Convergence
+
+- [ ] T050 Release `tailnet`: merge this branch so `release.yaml` publishes `ghcr.io/flumpiey/devcontainer-features/tailnet`, then apply `specs/002-env-features/orca-server-installsafter.patch` (this completes T042) and re-run `bash scripts/verify.sh ci` per FR-025 and AC9 (missing)
+- [X] T051 Reword the `tailnet` option descriptions in `src/tailnet/devcontainer-feature.json` so `hostnamePrefix`, `tags` and `authKeyVar` state their default and the tested versions (Tailscale Feature 1.0.8, Tailscale 1.104.7), not only `ssh`, per FR-010 and the Constitution platform constraints (partial)
+- [X] T052 Add the scenario `no_sudo` to `test/tailnet/scenarios.json` and `test/tailnet/no_sudo.sh`: a non-root entrypoint with no `sudo` on `PATH` prints one error line to the container output, does not join, and reaches `exec "$@"`, per FR-028 and the Edge Cases entry on a missing `sudo` (partial)
+- [X] T053 Measure the time the `tailnet` entrypoint takes to reach `exec "$@"` and tighten the limit in `test/tailnet/daemon_down.sh` from 10 seconds to the 1 second goal in the plan Technical Context (partial)
+
+Evidence for Phase 7 (2026-11-25):
+
+- T051: the four `tailnet` option descriptions now state the default and the tested versions; `verify.sh fast` printed `verify: fast ok`.
+- T052: scenario `no_sudo` and `test/tailnet/no_sudo.sh` passed on bookworm and in `ci` (`Passed: 'no_sudo'` on three bases).
+- T053: the entrypoint reached `exec` in 14 ms; the limit in `test/tailnet/daemon_down.sh` is now 1000 ms and the scenario passed.
+- Gate: `bash scripts/verify.sh ci` printed `verify: ci ok` after 1669 s.
+- T050 stays open: it needs the release. T042, T047 and T049 stay open for the same reason or for review with Dru.

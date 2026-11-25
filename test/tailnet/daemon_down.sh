@@ -13,12 +13,15 @@ failure_is_logged() {
   sudo -n grep -q 'tailscaled did not answer' "$LOG" && [ ! -s "$ARGS" ]
 }
 
-# Constitution VI: the entrypoint reaches exec "$@" at once, while the join still waits in the background.
+# Constitution VI: the entrypoint reaches exec "$@" in under 1 second (plan goal), while the join still waits in the background.
 entrypoint_does_not_block() {
-  local start="$SECONDS" out
+  local start end out
   install_stub
+  start="$(date +%s%N)"
   out="$(sudo -n env TAILSCALE_STUB_MODE=down TS_AUTH_KEY=test-auth-key bash "$ENTRY" echo reached)"
-  [ "$out" = reached ] && [ $((SECONDS - start)) -lt 10 ]
+  end="$(date +%s%N)"
+  echo "entrypoint took $(((end - start) / 1000000)) ms" >&2
+  [ "$out" = reached ] && [ $(((end - start) / 1000000)) -lt 1000 ]
 }
 
 check "tailscaled not answering is logged and no join runs" failure_is_logged
