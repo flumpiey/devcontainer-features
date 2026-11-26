@@ -25,7 +25,7 @@ An unused pairing link stays valid after a container restart. Its grant is in th
 1. Set `showPairingOnAttach` to `false` and rebuild, when attach output is logged. Otherwise the next attach prints the new links in the same place.
 2. Open a terminal in the container as the remote user.
 3. Run `orca-server status`. It must print `running`. If it prints `stopped`, run `orca-server start`.
-4. Run both commands. Each one revokes only its own kind of link.
+4. Run both commands. Each one revokes only its own kind of link, so one command alone leaves the other link valid.
 
 ```bash
 orca-ide pair --rotate >/dev/null           # revokes unused desktop links
@@ -34,7 +34,7 @@ orca-ide pair --mobile --rotate >/dev/null  # revokes unused mobile links
 
 Both commands must exit 0. Then `orca-server url` and `orca-server url --mobile` print new links. `pairing-url.txt` and the log keep the old link until the next start, but that link no longer pairs.
 
-The commands do not remove a client that already paired. This includes a stranger who used a leaked link before you revoked it. Remove that client in Orca under Shared Server Access. If you cannot, delete the volume `orca-server-data-<id>` and rebuild. Every client must then pair again.
+Rotate does not remove an already paired client, and neither removal method below is tested. This includes a stranger who used a leaked link before you revoked it. Remove that client in Orca under Shared Server Access. If you cannot, delete the volume `orca-server-data-<id>` and rebuild. Every client must then pair again.
 
 ## Example devcontainer.json
 
