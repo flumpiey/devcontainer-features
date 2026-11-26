@@ -184,3 +184,11 @@
 - [X] T066 Add one line to the "Withdraw a bad version" section of `src/orca-server/NOTES.md`: users can pin an exact version such as `:1.0.0` to avoid a withdrawn patch. per FR-031 (partial)
 - [X] T067 Change the `version` option description in `src/orca-server/devcontainer-feature.json` to name `1.4.271` as the default and the tested version, and keep `debSha256` in step. per Constitution, Technical Constraints (partial)
 - [X] T068 Review the checks in `install.sh` that FR-028 does not list (`mobilePairing` and `autoStart` must be `true` or `false`, `pairingAddress` character set, `debSha256` is 64 hex digits). Keep them, because `options.env` is sourced as shell, and add a line to `plan.md` Decisions recorded, or remove them. per FR-028 (unrequested)
+
+## Phase 11: Pairing at attach (added 2026-11-26)
+
+- [X] T069 [US3] Add `show [--attach]` to `src/orca-server/orca-server`. per FR-030
+- [X] T070 [US3] Add option `showPairingOnAttach` and `postAttachCommand` to `src/orca-server/devcontainer-feature.json`, set version 1.1.0, and validate and store the option in `install.sh`. per FR-030
+- [X] T071 [US3] Add checks to `test/orca-server/pairing_files.sh` and `test/orca-server/no_autostart.sh`. per FR-030, AC 18
+- [X] T072 Update `NOTES.md`, `README.md`, the contracts and `data-model.md`.
+- [X] T073 Run `bash scripts/verify.sh ci`.

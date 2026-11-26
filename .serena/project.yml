@@ -156,7 +156,27 @@ added_modes:
 
 # initial prompt for the project. It will always be given to the LLM upon activating the project
 # (contrary to the memories, which are loaded on demand).
-initial_prompt: "Dev Container Features repo. Features are bash install scripts with a devcontainer-feature.json each. Commits follow Conventional Commits and run through lefthook and commitlint. Never skip hooks."
+initial_prompt: |
+  Dev Container Features repo: GitHub flumpiey/devcontainer-features (default branch main, MIT licence).
+  Features publish to ghcr.io/flumpiey/devcontainer-features.
+
+  Layout:
+  - src/<id>/: devcontainer-feature.json, install.sh, NOTES.md, runtime scripts. Only Feature so far: orca-server.
+  - test/<id>/: test.sh, scenarios.json (image placeholder __BASE__). test/_global/: cross-Feature scenarios and a Tailscale stub.
+  - scripts/: verify.sh (all checks), commit-msg.sh, worktree-setup.sh (Orca worktree setup).
+  - specs/NNN-name/: Spec Kit artefacts. Constitution: .specify/memory/constitution.md (binding).
+  - docs/analysis/: analysis notes. DevcontainerFeatures-Output/: generated docs, ignored by Serena.
+
+  Stack: Bash Features, devcontainer CLI 0.88.0, pnpm for commit tooling only, GitHub Actions. Dev host is Windows (Git Bash).
+  Targets: Debian 12, Ubuntu 22.04, Ubuntu 24.04, amd64 only.
+
+  Checks: bash scripts/verify.sh {fast|push|ci}. ci is the definition of done and needs Docker.
+
+  Rules: every script uses set -euo pipefail and passes shellcheck and shfmt -i 2. Installs are idempotent.
+  Downloads are pinned by Feature options. No secrets in image layers. Entrypoints never block container start.
+  A Feature change updates its tests in the same commit. Docs use British spelling, no em or en dashes, no emojis.
+  Commits follow Conventional Commits through lefthook and commitlint. No AI attribution. Never skip hooks.
+  Read memory core for more detail.
 
 # time budget (seconds) per tool call for the retrieval of additional symbol information
 # such as docstrings or parameter information.

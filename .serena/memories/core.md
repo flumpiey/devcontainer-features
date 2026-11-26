@@ -1,10 +1,9 @@
 # devcontainer-features core
 
-- Purpose: Dev Container Features repo (GitHub flumpiey/devcontainer-features, default branch `main`). As of 2026-11-23 it holds tooling only, no Feature code yet.
-- Planned Feature layout (devcontainers spec): `src/<id>/devcontainer-feature.json` + `install.sh`; tests in `test/<id>/`.
-- Tooling files at root: `package.json` (commit tooling only, private), `commitlint.config.mjs`, `lefthook.yml`, `orca.yaml`, `.gitattributes` (`*.sh` forced LF), `.github/workflows/pr-hygiene.yml`.
-- `scripts/worktree-setup.sh`: Orca worktree setup, runs `npm ci` only if `package-lock.json` exists.
-- `.specify/` and `.claude/skills/speckit-*`: Spec Kit scaffolding (PowerShell scripts, Windows). Constitution at `.specify/memory/constitution.md` is still the unfilled template.
-- `DevcontainerFeatures-Output/`: generated docs, ignored by Serena. Holds the Orca setup sheet.
-- Never commit AI attribution. See `mem:conventions`.
-- Commands: `mem:suggested_commands`. Done-criteria: `mem:task_completion`. Stack: `mem:tech_stack`.
+- Dev Container Features repo, published to `ghcr.io/flumpiey/devcontainer-features`. One Feature: `orca-server`.
+- Binding rules: `.specify/memory/constitution.md` (v1.0.0). It wins over templates, scripts and habits.
+- `src/<id>/` Feature; `test/<id>/` tests; `test/_global/` cross-Feature; `specs/NNN-name/` Spec Kit; `test/verify-fast-untracked.sh` tests `verify.sh` itself and is run by hand.
+- `.specify/scripts/powershell/` and `.claude/skills/speckit-*`: Spec Kit scaffolding, not product code.
+- `DevcontainerFeatures-Output/`: generated docs, ignored by Serena. Its SPECS-INDEX holds the spec roadmap and may lag git.
+- Read `mem:orca-server/core` before any change to the orca-server Feature or its tests.
+- Commands: `mem:suggested_commands`. Done criteria: `mem:task_completion`. Versions and CI: `mem:tech_stack`. Style and commits: `mem:conventions`.

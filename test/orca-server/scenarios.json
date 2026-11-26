@@ -57,7 +57,8 @@
       "orca-server": {
         "pairingAddress": "127.0.0.1",
         "autoStart": false,
-        "mobilePairing": false
+        "mobilePairing": false,
+        "showPairingOnAttach": false
       }
     }
   },

@@ -1,6 +1,6 @@
 # Contract: Feature options
 
-Feature id `orca-server`, version `1.0.0`, `ghcr.io/flumpiey/devcontainer-features/orca-server`.
+Feature id `orca-server`, version `1.1.0`, `ghcr.io/flumpiey/devcontainer-features/orca-server`.
 
 | Option | Type | Default | Environment variable in `install.sh` |
 |--------|------|---------|--------------------------------------|
@@ -9,6 +9,7 @@ Feature id `orca-server`, version `1.0.0`, `ghcr.io/flumpiey/devcontainer-featur
 | `port` | string | `6768` | `PORT` |
 | `mobilePairing` | boolean | `true` | `MOBILEPAIRING` |
 | `autoStart` | boolean | `true` | `AUTOSTART` |
+| `showPairingOnAttach` | boolean | `true` | `SHOWPAIRINGONATTACH` |
 | `tailscaleWaitSeconds` | string | `120` | `TAILSCALEWAITSECONDS` |
 | `debSha256` | string | `7fad3d721dc0b0920f248353f5391fe0138331791acb64c9677c7a91bf41e755` | `DEBSHA256` |
 
@@ -18,6 +19,7 @@ Feature metadata:
 
 - `installsAfter`: `ghcr.io/tailscale/codespace/tailscale`, `ghcr.io/devcontainers-extra/features/tailscale`
 - `entrypoint`: `/usr/local/share/orca-server/entrypoint.sh`
+- `postAttachCommand`: `/usr/local/bin/orca-server show --attach`
 - `mounts`: `{"source": "orca-server-data-${devcontainerId}", "target": "/var/lib/orca-server", "type": "volume"}`
 
 Usage:

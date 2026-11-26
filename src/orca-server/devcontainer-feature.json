@@ -1,6 +1,6 @@
 {
   "id": "orca-server",
-  "version": "1.0.1",
+  "version": "1.1.0",
   "name": "Orca server",
   "description": "Installs Orca (orca-ide) and serves it on your tailnet at container start.",
   "options": {
@@ -29,6 +29,11 @@
       "default": true,
       "description": "Start Orca in the background at container start."
     },
+    "showPairingOnAttach": {
+      "type": "boolean",
+      "default": true,
+      "description": "Print the pairing link and the mobile QR code in the terminal at each attach. Set false when attach output is logged."
+    },
     "tailscaleWaitSeconds": {
       "type": "string",
       "default": "120",
@@ -45,6 +50,7 @@
     "ghcr.io/devcontainers-extra/features/tailscale"
   ],
   "entrypoint": "/usr/local/share/orca-server/entrypoint.sh",
+  "postAttachCommand": "/usr/local/bin/orca-server show --attach",
   "mounts": [
     {
       "source": "orca-server-data-${devcontainerId}",

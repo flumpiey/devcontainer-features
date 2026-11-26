@@ -37,6 +37,7 @@
 18. (Decided 2026-11-23) `/var/lib/orca-server` is mode 0700 and `pairing-url.txt` is mode 0600, both owned by the remote user. The entrypoint enforces owner and mode at each start, so an existing volume with other values is corrected.
 19. (Decided 2026-11-23) The GHCR package `ghcr.io/flumpiey/devcontainer-features/orca-server` MUST be public. A new package is private by default. `NOTES.md` states the one-time step to set the visibility to public after the first publish.
 20. (Decided 2026-11-23) Option `debSha256`, string, default `7fad3d721dc0b0920f248353f5391fe0138331791acb64c9677c7a91bf41e755` (the `v1.4.271` digest). A value other than the default is always the expected hash. If the resolved `version` is not the default and `debSha256` still equals the default, the expected hash comes from the release API. When `version` is `latest`, the resolved version is compared with the default version first. `install.sh` holds the default version and default hash as constants. The full rules, exit codes and message are in FR-024.
+21. (Decided 2026-11-26) The Feature shows the desktop link, the mobile QR code and the mobile link in the terminal at each attach, through its `postAttachCommand`. Option `showPairingOnAttach`, boolean, default true, turns this off. The build shows no link (FR-022).
 
 ## User Scenarios & Testing *(mandatory)*
 
@@ -168,6 +169,7 @@ As Dru, a push to main that changes the Feature version publishes it to GHCR and
 - **FR-027**: `orca-server start` MUST start no second Orca process when one runs or when another `start` waits for Tailscale. It holds the lock file `/var/lib/orca-server/orca-server.lock` (mode 0600, owned by the remote user) from the start of the wait until Orca has launched. A second `start` that finds the lock held, or Orca running, exits 0 and starts nothing.
 - **FR-028**: `install.sh` MUST validate options and exit 1 with one line on a bad value: `port` an integer from 1 to 65535, `tailscaleWaitSeconds` a non-negative integer, `version` equal to `latest` or matching `^[0-9]+\.[0-9]+\.[0-9]+$`.
 - **FR-029**: The devcontainer CLI, shellcheck, shfmt and every GitHub Action that CI uses MUST be pinned to a full version or a commit SHA. The apt dependencies of the .deb resolve from the base distribution and are not pinned.
+- **FR-030**: `orca-server show` MUST print the desktop link, then the QR code and link from `orca-ide pair --mobile`. With `mobilePairing` false it MUST print only the desktop link. It MUST wait up to `tailscaleWaitSeconds` plus 60 seconds for Orca, MUST NOT wait when `autoStart` is false and Orca is not running, and MUST always exit 0. The Feature `postAttachCommand` MUST run `orca-server show --attach`, which prints nothing when `showPairingOnAttach` is false. This adds an option to FR-007 and a subcommand to FR-016. `install.sh` MUST reject a `showPairingOnAttach` other than `true` or `false`.
 - **FR-030**: The test workflow MUST have the permission `contents: read` only and MUST use no secret. On pull requests, CI MUST also run the publish action in `validate-only` mode.
 - **FR-031**: A bad published version is withdrawn by publishing a fixed patch version. Users can pin an exact version such as `:1.0.0`. `NOTES.md` MUST describe both steps and how to delete a package version in the GitHub package settings.
 
@@ -201,6 +203,7 @@ As Dru, a push to main that changes the Feature version publishes it to GHCR and
 15. A build with option debSha256 set to a wrong value fails, and the build log names the expected hash and the actual hash.
 16. The command line of the orca-ide serve process, read from /proc/<pid>/cmdline, contains "--refuse-public".
 17. Without registry credentials, "devcontainer features info manifest ghcr.io/flumpiey/devcontainer-features/orca-server:1" succeeds.
+18. "orca-server show --attach" exits 0 and prints the desktop link, a QR code and the mobile link.
 
 ### Measurable Outcomes
 

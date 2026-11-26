@@ -22,6 +22,7 @@ MOBILEPAIRING="${MOBILEPAIRING:-true}"
 AUTOSTART="${AUTOSTART:-true}"
 TAILSCALEWAITSECONDS="${TAILSCALEWAITSECONDS:-120}"
 DEBSHA256="${DEBSHA256:-$DEFAULT_DEB_SHA256}"
+SHOWPAIRINGONATTACH="${SHOWPAIRINGONATTACH:-true}"
 REMOTE_USER="${_REMOTE_USER:-}"
 
 # Read os-release in a subshell: it defines VERSION, which is also an option name.
@@ -57,6 +58,8 @@ TAILSCALEWAITSECONDS=$((10#$TAILSCALEWAITSECONDS))
   fail 1 "mobilePairing must be true or false, got '$MOBILEPAIRING'"
 [[ "$AUTOSTART" == true || "$AUTOSTART" == false ]] ||
   fail 1 "autoStart must be true or false, got '$AUTOSTART'"
+[[ "$SHOWPAIRINGONATTACH" == true || "$SHOWPAIRINGONATTACH" == false ]] ||
+  fail 1 "showPairingOnAttach must be true or false, got '$SHOWPAIRINGONATTACH'"
 DEBSHA256="${DEBSHA256,,}"
 [[ "$DEBSHA256" =~ ^[0-9a-f]{64}$ ]] ||
   fail 1 "debSha256 must be 64 hex digits, got '$DEBSHA256'"
@@ -132,6 +135,7 @@ MOBILE_PAIRING=$MOBILEPAIRING
 AUTO_START=$AUTOSTART
 TAILSCALE_WAIT_SECONDS=$TAILSCALEWAITSECONDS
 DEB_SHA256=$DEBSHA256
+SHOW_PAIRING_ON_ATTACH=$SHOWPAIRINGONATTACH
 EOF
 printf '%s\n' "$REMOTE_USER" >"$SHARE_DIR/remote-user"
 chmod 0644 "$SHARE_DIR/options.env" "$SHARE_DIR/remote-user"
