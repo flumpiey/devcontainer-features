@@ -9,6 +9,8 @@ Path: `/usr/local/bin/orca-server`. Runs as the remote user. When run as root, i
 | `status` | Check the PID file and the process. | `running` or `stopped` | 0 running, 3 stopped |
 | `url` | Run `orca-ide pair --address <resolved address>`. Print the first `orca://pair` token. | one line, the desktop link | 0; 1 if Orca is not running or pairing is unavailable |
 | `url --mobile` | Run `orca-ide pair --mobile --address <resolved address>`. Print the first `orca://pair` token. | one line, the mobile link | 0; 1 if Orca is not running or pairing is unavailable |
+| `show` | Wait up to `tailscaleWaitSeconds` plus 60 s for a running Orca with a pairing link. With `autoStart` false and no running Orca, do not wait. Then run both `pair` forms; with `mobilePairing` false, only the desktop form. | the desktop link, then the mobile QR code and link; one `orca-server: error: ` line on stderr on failure | always 0 |
+| `show --attach` | As `show`. Does nothing when `showPairingOnAttach` is false. The Feature `postAttachCommand` runs it. | as `show`, or none | always 0 |
 
 Rules:
 

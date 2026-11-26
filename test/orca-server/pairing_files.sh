@@ -30,6 +30,16 @@ links_differ() {
     [[ "$desktop" == orca://pair* && "$mobile" == orca://pair* ]] && [ "$desktop" != "$mobile" ]
 }
 
+# AC18: show prints the desktop link, the QR code and the mobile link. Both offers stay the same.
+show_prints_links_and_qr() {
+  local desktop mobile out
+  desktop="$(orca-server url)"
+  mobile="$(orca-server url --mobile)"
+  out="$(orca-server show --attach)"
+  grep -qxF "$desktop" <<<"$out" && grep -qF "$mobile" <<<"$out" && grep -q '▄' <<<"$out" &&
+    [ "$(orca-server url)" = "$desktop" ]
+}
+
 # AC8: owners and modes.
 owners_and_modes() {
   local want
@@ -42,6 +52,7 @@ owners_and_modes() {
 check "pairing-url.txt appears within 90 s" pairing_file_ready
 check "pairing-url.txt holds one link" pairing_file_is_one_link
 check "url and url --mobile print one differing link each" links_differ
+check "show prints both links and the QR code" show_prints_links_and_qr
 check "owners and modes are correct" owners_and_modes
 
 reportResults

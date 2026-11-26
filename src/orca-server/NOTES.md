@@ -1,13 +1,16 @@
 ## Pair once
 
-Orca starts at container start. Read one link from the container terminal and paste it in the Orca client under Settings, Remote Orca Servers, Add Server.
+Orca starts at container start. At each attach, the terminal shows the desktop link, then the mobile QR code and link. Paste the desktop link in the Orca client under Settings, Remote Orca Servers, Add Server. Scan the QR code with Orca Mobile. The QR code needs a terminal at least 80 columns wide.
+
+The image build cannot show a link, because Orca does not run then. A tool that ignores `postAttachCommand` shows nothing. Attach output can stay in Dev Containers, Codespaces or CI logs. Anyone who reads a link and can reach the server can pair. Set `showPairingOnAttach` to `false` to stop the attach output. In CI, `devcontainer up --skip-post-attach` also stops it.
 
 ```bash
+orca-server show          # both links and the QR code
 orca-server url           # desktop link
 orca-server url --mobile  # mobile link
 ```
 
-Each command prints one `orca://pair` line. Treat the link like a password. The pairing grant lives in the volume `orca-server-data-${devcontainerId}`, so a rebuild keeps it and the client reconnects with no new link.
+Each `url` command prints one `orca://pair` line. Treat the link like a password. The pairing grant lives in the volume `orca-server-data-${devcontainerId}`, so a rebuild keeps it and the client reconnects with no new link.
 
 If a client does not reconnect after a rebuild, pair it again by hand:
 
@@ -53,6 +56,7 @@ When the data folder is not writable, the entrypoint prints one `orca-server: er
 | `orca-server stop` | Stops Orca. Exit 0. |
 | `orca-server status` | Prints `running` (exit 0) or `stopped` (exit 3). |
 | `orca-server url [--mobile]` | Prints one pairing link. Exit 1 when Orca is not running. |
+| `orca-server show [--attach]` | Waits for Orca, then prints both links and the QR code. Always exit 0. With `--attach`, prints nothing when `showPairingOnAttach` is `false`. |
 
 Orca does not restart after a crash or a port conflict. Run `orca-server start` after you fix the cause.
 

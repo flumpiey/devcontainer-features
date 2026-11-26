@@ -8,7 +8,7 @@
 | `/usr/local/share/orca-server/entrypoint.sh` | `install.sh` | entrypoint, mode 0755 |
 | `/usr/local/bin/orca-server` | `install.sh` | control script, mode 0755 |
 | `/usr/local/share/orca-server/remote-user` | `install.sh` | one line: the user name from `_REMOTE_USER` |
-| `/usr/local/share/orca-server/options.env` | `install.sh` | `KEY=value` lines for the six options, no secret |
+| `/usr/local/share/orca-server/options.env` | `install.sh` | `KEY=value` lines for the options, no secret |
 | `/var/lib/orca-server` | `install.sh` | directory owned by the remote user, so a new named volume inherits the owner |
 
 ## Run-time state
@@ -34,6 +34,7 @@ All four are owned by the remote user. The entrypoint enforces owner and mode at
 | `AUTO_START` | `autoStart` | `true` |
 | `TAILSCALE_WAIT_SECONDS` | `tailscaleWaitSeconds` | `120` |
 | `DEB_SHA256` | `debSha256` | `7fad3d721dc0b0920f248353f5391fe0138331791acb64c9677c7a91bf41e755` (not read at run time) |
+| `SHOW_PAIRING_ON_ATTACH` | `showPairingOnAttach` | `true` |
 
 ## Process states
 

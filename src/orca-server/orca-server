@@ -14,15 +14,16 @@ URL_FILE="$DATA_DIR/pairing-url.txt"
 log() { echo "orca-server: $*" >>"$LOG"; }
 err() { echo "orca-server: error: $*" >&2; }
 usage() {
-  echo "usage: orca-server {start|stop|status|url [--mobile]}" >&2
+  echo "usage: orca-server {start|stop|status|url [--mobile]|show [--attach]}" >&2
   exit 2
 }
 
 case "${1:-}:$#" in
-start:1 | stop:1 | status:1 | url:1 | url:2) ;;
+start:1 | stop:1 | status:1 | url:1 | url:2 | show:1 | show:2) ;;
 *) usage ;;
 esac
 if [ "$1" = url ] && [ "$#" -eq 2 ] && [ "$2" != --mobile ]; then usage; fi
+if [ "$1" = show ] && [ "$#" -eq 2 ] && [ "$2" != --attach ]; then usage; fi
 
 # Run as the remote user. --preserve-environment keeps ORCA_SERVER_LOG_FRESH, but it
 # also keeps HOME=/root, which Orca cannot read, so set the user's own HOME.
@@ -193,6 +194,31 @@ cmd_url() {
     return 1
   fi
   printf '%s\n' "$link"
+}
+
+# FR-030: print the pairing links and the mobile QR code. Always return 0, so an attach step cannot fail.
+cmd_show() {
+  local limit link addr
+  if [ "${1:-}" = --attach ] && [ "$SHOW_PAIRING_ON_ATTACH" != true ]; then return 0; fi
+  # Wait until Orca runs and has printed its first link. With autoStart false nothing starts by itself.
+  # shortcut: a failed start still waits the full limit; read the log for an error line if that hurts.
+  limit=$((SECONDS + TAILSCALE_WAIT_SECONDS + 60))
+  if [ "$AUTO_START" != true ] && ! running_pid >/dev/null; then limit=$SECONDS; fi
+  until running_pid >/dev/null && [ -s "$URL_FILE" ]; do
+    if [ "$SECONDS" -ge "$limit" ]; then
+      err "Orca is not ready; see $LOG, then run: orca-server show"
+      return 0
+    fi
+    sleep 1
+  done
+  if link="$(cmd_url)"; then
+    printf 'Orca desktop (Settings, Remote Orca Servers, Add Server). Treat the link like a password:\n%s\n\n' "$link"
+  fi
+  if [ "$MOBILE_PAIRING" = true ]; then
+    addr="$(TAILSCALE_WAIT_SECONDS=0 resolve_address)" || return 0
+    # Orca prints the QR code, the mobile link and its own warning.
+    orca-ide pair --mobile --address "$addr" || err "orca-ide pair --mobile failed"
+  fi
 }
 
 cmd="$1"
