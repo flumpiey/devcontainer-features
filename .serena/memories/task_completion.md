@@ -1,7 +1,8 @@
 # Task completion
 
-- Commit through the normal hook path. The commit-msg hook must pass commitlint.
-- If a Feature `install.sh` or `devcontainer-feature.json` changed: run the devcontainer CLI test for that Feature once a `test/` folder exists. No test runner is configured yet.
-- If a shell script changed: run `git ls-files --eol <file>` and confirm `i/lf`.
-- Do not push or open a PR without explicit user permission.
-- A PR title must itself pass commitlint (it becomes the squash commit). CI job `pr-hygiene` checks it.
+- Feature, test or script change: `bash scripts/verify.sh ci` must pass before the commit (constitution VIII).
+- Docs-only change: `bash scripts/verify.sh fast`.
+- Feature change: update `test/<id>/` scenarios in the same commit.
+- Shipped Feature behaviour change: bump `version` in `devcontainer-feature.json`, or the release publishes nothing.
+- Commit through the normal hook path. Commit, push and PR only with explicit user permission.
+- PR title must pass commitlint. The PR description records any constitution exception.
