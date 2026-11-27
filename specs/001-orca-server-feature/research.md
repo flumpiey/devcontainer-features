@@ -54,7 +54,7 @@ Full sourced findings: [docs/analysis/261123-orca-server-feature.md](../../docs/
 
 - Decision: always pass `--refuse-public`.
 - Verified in source (v1.4.271 `main`): `network-source-class.ts` classifies 100.64.0.0/10 and fd7a:115c:a1e0::/48 as `tailnet`, checked before `private`. `ws-network-source-guard.ts` refuses only peers of class `public` (and not on-link global addresses). `serve-network-source-policy.ts` makes `--refuse-public` override grandfathering, remembered public sightings and the pairing-address rule.
-- Why it is needed: a MagicDNS name such as `host.boga-amberjack.ts.net` classifies as `public` (it contains a dot and is not an IP), so without the flag `--pairing-address` opens Orca to public peers.
+- Why it is needed: a MagicDNS name such as `host.example.ts.net` classifies as `public` (it contains a dot and is not an IP), so without the flag `--pairing-address` opens Orca to public peers.
 - Limits: the judgement uses the TCP peer address. A client behind a Docker port forward arrives as a private 172.x address and is accepted. A peer through Tailscale userspace networking arrives as loopback and is accepted. A client on a public path is refused.
 
 ## D11. Desktop and mobile links
