@@ -10,7 +10,7 @@
 
 ## Context
 
-- Dru runs one devcontainer per project (Nx monorepos, pnpm) on dru-main-pc under Docker Desktop on WSL2. Each container joins the tailnet boga-amberjack.ts.net through the Feature `ghcr.io/tailscale/codespace/tailscale`, with Tailscale SSH, `tag:devcontainer`, and hostname `<HOSTNAME_PREFIX>-<folder>-dev`.
+- Dru runs one devcontainer per project (Nx monorepos, pnpm) on a Windows host under Docker Desktop on WSL2. Each container joins the tailnet example.ts.net through the Feature `ghcr.io/tailscale/codespace/tailscale`, with Tailscale SSH, `tag:devcontainer`, and hostname `<HOSTNAME_PREFIX>-<folder>-dev`.
 - Orca headless mode is `orca-ide serve --port <port> --pairing-address <address>`. It prints a pairing URL that the client pastes into Settings, Remote Orca Servers, Add Server. `--mobile-pairing` enables phone pairing. Orca starts Xvfb on display :99 when no display exists.
 - The Linux .deb installs to `/opt/Orca` and provides the `orca-ide` command. It declares `libasound2t64 | libasound2`, `xvfb`, `libgbm1` and `libnss3` as dependencies, so `apt-get install` resolves them (research.md, analysis R5).
 - Orca has no environment variable or flag for a fixed pairing credential. Each paired client gets a revocable grant that stays valid until revoked.
@@ -214,7 +214,7 @@ As Dru, a push to main that changes the Feature version publishes it to GHCR and
 
 ## Assumptions
 
-- Dru is the only user. The host is dru-main-pc, Docker Desktop on WSL2, amd64.
+- Dru is the only user. The host is a Windows host, Docker Desktop on WSL2, amd64.
 - The Tailscale Feature handles login, SSH and hostname. This Feature only reads its status.
 - The newest passing release tag for the `version` default is chosen at plan time.
 - GitHub release assets of stablyai/orca are reachable at build time.
