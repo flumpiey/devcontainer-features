@@ -1,6 +1,6 @@
 {
   "id": "orca-server",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "name": "Orca server",
   "description": "Installs Orca (orca-ide) and serves it on your tailnet at container start.",
   "options": {
@@ -47,7 +47,8 @@
   },
   "installsAfter": [
     "ghcr.io/tailscale/codespace/tailscale",
-    "ghcr.io/devcontainers-extra/features/tailscale"
+    "ghcr.io/devcontainers-extra/features/tailscale",
+    "ghcr.io/flumpiey/devcontainer-features/tailnet"
   ],
   "entrypoint": "/usr/local/share/orca-server/entrypoint.sh",
   "postAttachCommand": "/usr/local/bin/orca-server show --attach",

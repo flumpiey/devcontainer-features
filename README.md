@@ -53,7 +53,7 @@ The second command prints `Version 7.0.2`. The third prints `--max-old-space-siz
 
 | Id | Version | Options (default) | Usage |
 |---|---|---|---|
-| `orca-server` | 1.1.0 | `version` (`1.4.271`), `pairingAddress` (empty: Tailscale DNS name), `port` (`6768`), `mobilePairing` (`true`), `autoStart` (`true`), `showPairingOnAttach` (`true`), `tailscaleWaitSeconds` (`120`), `debSha256` (digest of 1.4.271) | `"ghcr.io/flumpiey/devcontainer-features/orca-server:1": {}` with `"ghcr.io/tailscale/codespace/tailscale": {}` |
+| `orca-server` | 1.1.1 | `version` (`1.4.271`), `pairingAddress` (empty: Tailscale DNS name), `port` (`6768`), `mobilePairing` (`true`), `autoStart` (`true`), `showPairingOnAttach` (`true`), `tailscaleWaitSeconds` (`120`), `debSha256` (digest of 1.4.271) | `"ghcr.io/flumpiey/devcontainer-features/orca-server:1": {}` with `"ghcr.io/tailscale/codespace/tailscale": {}` |
 | `tailnet` | 1.0.0 | `hostnamePrefix` (empty: `HOSTNAME_PREFIX`), `tags` (`tag:devcontainer`), `authKeyVar` (`TS_AUTH_KEY`), `ssh` (`true`) | `"ghcr.io/flumpiey/devcontainer-features/tailnet:1": {}` plus `runArgs` and `containerEnv` below |
 | `node-guard` | 1.0.0 | None. Override a value in `remoteEnv`. | `"ghcr.io/flumpiey/devcontainer-features/node-guard:1": {}` |
 | `ts7-cli` | 1.0.0 | `version` (`7.0.2`) | `"ghcr.io/flumpiey/devcontainer-features/ts7-cli:1": { "version": "7.0.2" }` |
